@@ -3,15 +3,14 @@ package ideas.Ecommerce.service;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.*;
 import ideas.Ecommerce.exception.IllegalArgument;
+import ideas.Ecommerce.exception.ResourceNotDeleted;
+import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.exception.UpdateNotPerformed;
 import ideas.Ecommerce.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,31 +55,38 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public List<ProductAndAverageRatingDTO> getProductsForCategory(Integer id){
+    public List<ProductAndAverageRatingDTO> getProductsForCategory(Integer id) {
         List<ProductAndRatingDTO> products = productRepository.findProductsByCategoryIdOrParentCategoryId(id);
         return products.stream()
                 .map(this::convertToProductAndAverageRatingDTO)
                 .collect(Collectors.toList());
     }
 
-    public Integer getProductStock(Integer productId){
-        return productRepository.findByProductId(productId).getProductStock();
+    public Integer getProductStock(Integer productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()) {
+            return product.get().getProductStock();
+        } else {
+            throw new ResourceNotFound("Product Not Found");
+        }
     }
 
-    public boolean updateProductStock(Integer productId , Integer updatedStock){
-        productRepository.updateProductStock(productId , updatedStock);
-        if(Objects.equals(updatedStock, getProductStock(productId))){
+    public boolean updateProductStock(Integer productId, Integer updatedStock) {
+        productRepository.updateProductStock(productId, updatedStock);
+        if (Objects.equals(updatedStock, getProductStock(productId))) {
             return true;
-        } else{
+        } else {
             throw new UpdateNotPerformed("Product Stock Not Updated.");
         }
     }
 
-//    TODO: Add Exception handling and check
-    public void deleteProductById(Integer Id){
+    public void deleteProductById(Integer Id) {
         productRepository.deleteById(Id);
+        Optional<Product> product = productRepository.findById(Id);
+        if (product.isPresent()) {
+            throw new ResourceNotDeleted("User ");
+        }
     }
-
 
     private ProductAndAverageRatingDTO convertToProductAndAverageRatingDTO(ProductAndRatingDTO product) {
         ProductAndAverageRatingDTO dto = new ProductAndAverageRatingDTO();
@@ -111,7 +117,6 @@ public class ProductService {
         dto.setReviews(convertToReviewDTOs(product.getReviews()));
         return dto;
     }
-
 
     private <T extends BaseCategoryDTO> CategoryDTO convertToCategoryDTO(T category) {
         CategoryDTO categoryDTO = new CategoryDTO();
@@ -169,6 +174,4 @@ public class ProductService {
 
         return dto;
     }
-
-
 }

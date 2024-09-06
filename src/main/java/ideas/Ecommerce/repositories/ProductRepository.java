@@ -14,7 +14,9 @@ import java.util.List;
 public interface ProductRepository extends CrudRepository<Product , Integer> {
 
     List<ProductAndRatingDTO> findBy();
+
     ProductAndReviewDTO findByProductId(Integer id);
+
     List<ProductAndRatingDTO> findByProductPriceLessThan(Double price);
 
     List<ProductAndRatingDTO> findByProductPriceGreaterThan(Double price);
