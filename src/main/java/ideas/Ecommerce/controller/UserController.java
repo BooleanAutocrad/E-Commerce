@@ -33,7 +33,7 @@ public class UserController {
 
 //    TODO: Create New User
     @PostMapping("/authenticate/register")
-    public UserOnly registerUser(@RequestBody ApplicationUser user) {
+    public UserOnly registerUser(@RequestBody ApplicationUser user) throws Exception {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         ApplicationUser savedUser = userService.register(user);
         return new UserOnly(savedUser.getUserId(), savedUser.getUserName(), savedUser.getEmailId(), savedUser.getPassword(), savedUser.getAddress());

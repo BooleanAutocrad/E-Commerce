@@ -1,2 +1,2 @@
 # E-Commerce
-Used: Spring Boot for BackEnd ,H2 for Database , Angular for FrontEnd
+Used: Spring Boot for BackEnd ,H2(SQL) for Database , Angular for FrontEnd

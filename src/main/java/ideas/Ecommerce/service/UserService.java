@@ -23,18 +23,12 @@ public class UserService implements UserDetailsService {
     UserRepository userRepository;
 
 
-
-
-    public ApplicationUser register(ApplicationUser user) {
-        return userRepository.save(user);
-    }
-
-    public UserOnly login(ApplicationUser user){
-        UserOnly existingUser = findUserByEmailId(user);
-        if (!existingUser.getPassword().equals(user.getPassword())) {
-            throw new IncorrectPassword();
+    public ApplicationUser register(ApplicationUser user) throws Exception {
+        ApplicationUser existingUser = userRepository.findByEmailId(user.getEmailId());
+        if(existingUser != null){
+            throw new Exception("User Already Exists");
         }
-        return existingUser;
+        return userRepository.save(user);
     }
 
     public List<UserOnlyDTO> getAllUsers(){
