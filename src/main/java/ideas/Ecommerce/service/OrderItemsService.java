@@ -20,10 +20,18 @@ public class OrderItemsService {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    ProductService productService;
+
     public OrderItem createOrderItem(OrderItem orderItem, Integer userId) {
         Double totalAmount = orderItem.getProduct().getProductPrice() * orderItem.getQuantity();
+        Integer productStock = productService.getProductStockByProductId(orderItem.getProduct().getProductId());
+        if (productStock < orderItem.getQuantity()) {
+            throw new IllegalArgumentException("Product stock is less than the quantity you want to order");
+        }
         Order order = orderService.createOrder(new Order(0, totalAmount, null, new ApplicationUser(userId, null, null, null, null, null, null, null, null), null));
         orderItem.setOrder(new Order(order.getOrderId(), null, null, null, null));
+        productService.updateProductStock(orderItem.getProduct().getProductId(), productStock - orderItem.getQuantity());
         return orderItemRepository.save(orderItem);
     }
 
@@ -32,12 +40,19 @@ public class OrderItemsService {
     }
 
     public List<OrderItem> saveAllOrderItems(List<OrderItem> orderItems, Integer userId) {
-        Double totalAmount = calculateTotalAmountOfOrder(orderItems);
-        Order order = orderService.createOrder(new Order(0, totalAmount, null, new ApplicationUser(userId, null, null, null, null, null, null, null, null), null));
-        orderItems.forEach(orderItem -> orderItem.setOrder(new Order(order.getOrderId(),null,null,null,null)));
-        return StreamSupport.stream(orderItemRepository.saveAll(orderItems).spliterator(), false)
-                    .collect(Collectors.toList());
-    }
+    Double totalAmount = calculateTotalAmountOfOrder(orderItems);
+    Order order = orderService.createOrder(new Order(0, totalAmount, null, new ApplicationUser(userId, null, null, null, null, null, null, null, null), null));
+    orderItems.forEach(orderItem -> {
+        orderItem.setOrder(new Order(order.getOrderId(), null, null, null, null));
+        Integer productStock = productService.getProductStockByProductId(orderItem.getProduct().getProductId());
+        if (productStock < orderItem.getQuantity()) {
+            throw new IllegalArgumentException("Product stock is less than the quantity you want to order");
+        }
+        productService.updateProductStock(orderItem.getProduct().getProductId(), productStock - orderItem.getQuantity());
+    });
+    return StreamSupport.stream(orderItemRepository.saveAll(orderItems).spliterator(), false)
+                .collect(Collectors.toList());
+}
 
     private Double calculateTotalAmountOfOrder(List<OrderItem> orderItems) {
         return orderItems.stream()

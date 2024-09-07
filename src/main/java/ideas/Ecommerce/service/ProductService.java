@@ -80,6 +80,15 @@ public class ProductService {
         }
     }
 
+    public Integer getProductStockByProductId(Integer productId) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()) {
+            return product.get().getProductStock();
+        } else {
+            throw new ResourceNotFound("Product Not Found");
+        }
+    }
+
     public void deleteProductById(Integer Id) {
         productRepository.deleteById(Id);
         Optional<Product> product = productRepository.findById(Id);
@@ -174,4 +183,6 @@ public class ProductService {
 
         return dto;
     }
+
+
 }
