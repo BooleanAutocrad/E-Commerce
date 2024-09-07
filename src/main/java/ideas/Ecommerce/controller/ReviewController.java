@@ -16,9 +16,9 @@ public class ReviewController {
     @Autowired
     ReviewService reviewService;
 
+//    TODO: Add Review For A Product
     @PostMapping("/review/add")
     public ReviewDTO addReview(@RequestBody Review review) throws Exception {
-//    TODO: Add Review For A Product
         return reviewService.writeReviewForProduct(review);
     }
 

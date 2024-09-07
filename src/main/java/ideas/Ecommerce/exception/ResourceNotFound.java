@@ -7,7 +7,7 @@ public class ResourceNotFound extends RuntimeException{
     private final String ResourceName;
 
     public ResourceNotFound(String ResourceName) {
-        super(ResourceName + " not deleted");
+        super(ResourceName + " not found");
         this.ResourceName = ResourceName;
     }
 

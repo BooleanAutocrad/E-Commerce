@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import utils.MockUtility;
+import utils.TestAssertions;
 
 import java.util.*;
 
@@ -26,7 +27,6 @@ public class ProductServiceTest {
 
     @InjectMocks
     private ProductService productService;
-
 
     @Mock
     private ProductRepository productRepository;
@@ -44,8 +44,7 @@ public class ProductServiceTest {
 
         Product savedProduct = productService.saveProduct(product);
 
-        assertNotNull(savedProduct);
-        assertEquals(1, savedProduct.getProductId());
+        TestAssertions.assertProduct(savedProduct, 1);
         verify(productRepository, times(1)).save(any(Product.class));
     }
 
@@ -63,11 +62,7 @@ public class ProductServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(1, result.get(0).getProductId());
-        assertEquals("Test Product", result.get(0).getProductName());
-        assertEquals("test-image-url", result.get(0).getProductImageURL());
-        assertEquals(100.0, result.get(0).getProductPrice());
-        assertEquals(10, result.get(0).getProductStock());
+        TestAssertions.assertProductDTO(result.get(0), 1, "Test Product", "test-image-url", 100.0, 10);
     }
 
 
@@ -82,22 +77,7 @@ public class ProductServiceTest {
 
         ProductReviewUserAverageRatingDTO result = productService.getProductById(1);
 
-        assertNotNull(result);
-        assertEquals(1, result.getProductId());
-        assertEquals("Test Product", result.getProductName());
-        assertEquals("test-image-url", result.getProductImageURL());
-        assertEquals(100.0, result.getProductPrice());
-        assertEquals(10, result.getProductStock());
-
-        assertNotNull(result.getCategory());
-        assertEquals(1, result.getCategory().getCategoryId());
-        assertEquals("Test Category", result.getCategory().getCategoryName());
-
-        assertNotNull(result.getReviews());
-        assertEquals(1, result.getReviews().size());
-        assertEquals(1, result.getReviews().get(0).getReviewId());
-        assertEquals("Test Review", result.getReviews().get(0).getReview());
-        assertEquals(5, result.getReviews().get(0).getRating());
+        TestAssertions.assertProductReviewUserAverageRatingDTO(result, 1, "Test Product", "test-image-url", 100.0, 10);
     }
 
     @Test
@@ -115,19 +95,8 @@ public class ProductServiceTest {
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        ProductAndAverageRatingDTO resultProduct1 = result.get(0);
-        assertEquals(1, resultProduct1.getProductId());
-        assertEquals("Product 1", resultProduct1.getProductName());
-        assertEquals("image-url-1", resultProduct1.getProductImageURL());
-        assertEquals(50.0, resultProduct1.getProductPrice());
-        assertEquals(20, resultProduct1.getProductStock());
-
-        ProductAndAverageRatingDTO resultProduct2 = result.get(1);
-        assertEquals(2, resultProduct2.getProductId());
-        assertEquals("Product 2", resultProduct2.getProductName());
-        assertEquals("image-url-2", resultProduct2.getProductImageURL());
-        assertEquals(150.0, resultProduct2.getProductPrice());
-        assertEquals(15, resultProduct2.getProductStock());
+        TestAssertions.assertProductDTO(result.get(0), 1, "Product 1", "image-url-1", 50.0, 20);
+        TestAssertions.assertProductDTO(result.get(1), 2, "Product 2", "image-url-2", 150.0, 15);
     }
 
 
@@ -151,19 +120,8 @@ public class ProductServiceTest {
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        ProductAndAverageRatingDTO resultProduct1 = result.get(0);
-        assertEquals(1, resultProduct1.getProductId());
-        assertEquals("Product 1", resultProduct1.getProductName());
-        assertEquals("image-url-1", resultProduct1.getProductImageURL());
-        assertEquals(80.0, resultProduct1.getProductPrice());
-        assertEquals(30, resultProduct1.getProductStock());
-
-        ProductAndAverageRatingDTO resultProduct2 = result.get(1);
-        assertEquals(2, resultProduct2.getProductId());
-        assertEquals("Product 2", resultProduct2.getProductName());
-        assertEquals("image-url-2", resultProduct2.getProductImageURL());
-        assertEquals(200.0, resultProduct2.getProductPrice());
-        assertEquals(25, resultProduct2.getProductStock());
+        TestAssertions.assertProductDTO(result.get(0), 1, "Product 1", "image-url-1", 80.0, 30);
+        TestAssertions.assertProductDTO(result.get(1), 2, "Product 2", "image-url-2", 200.0, 25);
     }
 
     @Test
@@ -221,5 +179,29 @@ public class ProductServiceTest {
         });
 
         assertEquals("Product Stock Not Updated. Something went wrong", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateProductStockProductNotFound() {
+        when(productRepository.findById(1)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(UpdateNotPerformed.class, () -> {
+            productService.updateProductStock(1, 20);
+        });
+
+        assertEquals("Product Not Found", exception.getMessage());
+    }
+    @Test
+    void testUpdateProductStockInvalidStock() {
+        Product mockProduct = MockUtility.createMockProduct(1, 20);
+
+        when(productRepository.findById(1)).thenReturn(Optional.of(mockProduct));
+        doNothing().when(productRepository).updateProductStock(1, 20);
+
+        Exception exception = assertThrows(IllegalArgument.class, () -> {
+            productService.updateProductStock(1, -20);
+        });
+
+        assertEquals("Stock cannot be negative", exception.getMessage());
     }
 }
