@@ -60,6 +60,7 @@ public class OrderService {
     }
 
     public Order createOrder(Order order){
+        order.setOrderDate(java.time.LocalDate.now().toString());
         return orderRepository.save(order);
     }
 }
