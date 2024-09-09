@@ -1,5 +1,6 @@
 package ideas.Ecommerce.filter;
 
+import ideas.Ecommerce.exception.ExpiredException;
 import ideas.Ecommerce.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,7 +36,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+            try{
+                username = jwtUtil.extractUsername(jwt);
+            } catch (ExpiredException e){
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("Token expired: " + e.getMessage());
+                return;
+            } catch(RuntimeException e){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Invalid token: " + e.getMessage());
+                return;
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

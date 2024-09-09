@@ -1,8 +1,7 @@
 package ideas.Ecommerce.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import ideas.Ecommerce.exception.ExpiredException;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,13 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        try{
+            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredException("Token ");
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e){
+            throw new RuntimeException("Invalid JWT token: " + e.getMessage());
+        }
     }
 
     private Boolean isTokenExpired(String token) {

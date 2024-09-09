@@ -31,9 +31,16 @@ public class GlobalExceptionHandler {
         String message = illegalArgument.getArgumentName() + " is not a valid condition";
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(UpdateNotPerformed.class)
     public ResponseEntity<String> updateNotPerformedException(UpdateNotPerformed updateNotPerformed){
         String message = updateNotPerformed.getErrorMessage() + " Something went wrong";
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ExpiredException.class)
+    public ResponseEntity<String> expiredException(ExpiredException expiredException){
+        String message = expiredException.getResourceName() + " has Expired";
+        return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
     }
 }
