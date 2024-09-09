@@ -23,7 +23,7 @@ public class OrderItemsService {
     @Autowired
     ProductService productService;
 
-    public OrderItem createOrderItem(OrderItem orderItem, Integer userId) {
+    public OrderItem BuyNow(OrderItem orderItem, Integer userId) {
         Double totalAmount = orderItem.getProduct().getProductPrice() * orderItem.getQuantity();
         Integer productStock = productService.getProductStockByProductId(orderItem.getProduct().getProductId());
         if (productStock < orderItem.getQuantity()) {
@@ -40,8 +40,7 @@ public class OrderItemsService {
     }
 
     public List<OrderItem> saveAllOrderItems(List<OrderItem> orderItems, Integer userId) {
-    Double totalAmount = calculateTotalAmountOfOrder(orderItems);
-    Order order = orderService.createOrder(new Order(0, totalAmount, null, new ApplicationUser(userId, null, null, null, null, null, null, null, null), null));
+    Order order = orderService.createOrder(new Order(0, null, null, new ApplicationUser(userId, null, null, null, null, null, null, null, null), null));
     orderItems.forEach(orderItem -> {
         orderItem.setOrder(new Order(order.getOrderId(), null, null, null, null));
         Integer productStock = productService.getProductStockByProductId(orderItem.getProduct().getProductId());
@@ -50,6 +49,7 @@ public class OrderItemsService {
         }
         productService.updateProductStock(orderItem.getProduct().getProductId(), productStock - orderItem.getQuantity());
     });
+    orderService.setOrderTotalAmount(order.getOrderId());
     return StreamSupport.stream(orderItemRepository.saveAll(orderItems).spliterator(), false)
                 .collect(Collectors.toList());
 }

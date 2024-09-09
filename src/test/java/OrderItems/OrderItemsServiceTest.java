@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import utils.MockUtility;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +50,7 @@ class OrderItemsServiceTest {
     }
 
     @Test
-    void createOrderItem_Success() {
+    void buyNow_Success() {
         Integer productId = 1;
         Product product = new Product(1, "Product1", "url", 100.0, 10, null, null, null, null);
         OrderItem orderItem = new OrderItem(1, 2, product, null);
@@ -62,7 +61,7 @@ class OrderItemsServiceTest {
         when(productService.getProductStockByProductId(productId)).thenReturn(10);
         when(orderService.createOrder(any(Order.class))).thenReturn(new Order(1, 500.0, "2023-10-10", new ApplicationUser(1, "User1", "email", "password", "address", "role", null, null, null), null));
 
-        OrderItem result = orderItemsService.createOrderItem(orderItem, 1);
+        OrderItem result = orderItemsService.BuyNow(orderItem, 1);
 
         assertNotNull(result);
         assertEquals(1, result.getProduct().getProductId());
@@ -71,14 +70,14 @@ class OrderItemsServiceTest {
     }
 
     @Test
-    void createOrderItem_InsufficientStock() {
+    void buyNow_InsufficientStock() {
         Product product = new Product(1, "Product1", "url", 100.0, 1, null, null, null, null);
         OrderItem orderItem = new OrderItem(1, 2, product, null);
 
         when(productRepository.findById(1)).thenReturn(Optional.of(product));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            orderItemsService.createOrderItem(orderItem, 1);
+            orderItemsService.BuyNow(orderItem, 1);
         });
 
         assertEquals("Product stock is less than the quantity you want to order", exception.getMessage());

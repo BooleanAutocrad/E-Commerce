@@ -16,7 +16,7 @@ public class OrderItemsController {
 //    TODO: Buy Now (Buy A Single Product Directly)
     @PostMapping("/orderItems/buynow/user/{userId}")
     public OrderItem createOrderItem(@RequestBody OrderItem orderItem, @PathVariable Integer userId){
-        return orderItemsService.createOrderItem(orderItem , userId);
+        return orderItemsService.BuyNow(orderItem , userId);
     }
 
 //    TODO: PlaceOrder (Buy Multiple Products)
