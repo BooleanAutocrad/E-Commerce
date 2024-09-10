@@ -60,11 +60,9 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public void setOrderTotalAmount(Integer orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFound("Order"));
-        double totalAmount = order.getOrderItems().stream().mapToDouble(item -> item.getQuantity() * item.getProduct().getProductPrice()).sum();
+    public Order setOrderTotalAmount(Order order , Double totalAmount) {
         order.setTotalAmount(totalAmount);
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     private OrderDTO convertToOrderDTO(Order order) {

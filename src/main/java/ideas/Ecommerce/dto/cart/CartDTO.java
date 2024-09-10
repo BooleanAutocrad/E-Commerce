@@ -22,7 +22,7 @@ public interface CartDTO {
     interface Product {
         Integer getProductId();
         String getProductName();
-        Double getPrice();
+        Double getProductPrice();
         String getProductImageURL();
     }
 }

@@ -71,13 +71,10 @@ public class ProductService {
         }
     }
 
-    public boolean updateProductStock(Integer productId, Integer updatedStock) {
-        productRepository.updateProductStock(productId, updatedStock);
-        if (Objects.equals(updatedStock, getProductStock(productId))) {
-            return true;
-        } else {
-            throw new UpdateNotPerformed("Product Stock Not Updated.");
-        }
+    public void updateProductStock(Integer productId, Integer updatedStock) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFound("Product"));
+        product.setProductStock(updatedStock);
+        productRepository.save(product);
     }
 
     public Integer getProductStockByProductId(Integer productId) {

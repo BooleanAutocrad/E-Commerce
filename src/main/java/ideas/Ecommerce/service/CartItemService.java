@@ -42,7 +42,13 @@ public class CartItemService {
         } else {
             cartItem.setCart(new Cart(cart.getCartId(),null,null,null));
         }
-        cartItemsRepository.save(cartItem);
+        CartItem existingCartItemForProduct = cartItemsRepository.findByCart_CartIdAndProduct_ProductId(cartItem.getCart().getCartId(),cartItem.getProduct().getProductId());
+        if (existingCartItemForProduct != null) {
+            existingCartItemForProduct.setQuantity(existingCartItemForProduct.getQuantity() + cartItem.getQuantity());
+            cartItemsRepository.save(existingCartItemForProduct);
+        } else {
+            cartItemsRepository.save(cartItem);
+        }
         cartService.updateCartTotalAmount(cartItem.getCart().getCartId());
     }
 

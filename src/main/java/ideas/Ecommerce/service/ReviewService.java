@@ -33,12 +33,8 @@ public class ReviewService {
         }
     }
 
-    public ReviewDTO updateReview(ReviewDTO review){
-        Review updatedReview = new Review();
-        updatedReview.setReviewId(review.getReviewId());
-        updatedReview.setReview(review.getReview());
-        updatedReview.setRating(review.getRating());
-        return convertReviewToReviewDTO(reviewRepository.save(updatedReview));
+    public ReviewDTO updateReview(Review review){
+        return convertReviewToReviewDTO(reviewRepository.save(review));
     }
 
     public void deleteReview(Integer id){

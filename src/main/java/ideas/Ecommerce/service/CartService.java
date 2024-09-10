@@ -6,6 +6,7 @@ import ideas.Ecommerce.dto.cart.CartDTO;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.CartItemsRepository;
 import ideas.Ecommerce.repositories.CartRepository;
+import ideas.Ecommerce.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,9 @@ public class CartService {
 
     @Autowired
     CartItemsRepository cartItemsRepository;
+
+    @Autowired
+    ProductRepository productRepository;
 
     public CartDTO getCartForUser(Integer userId){
         return cartRepository.findByUser_UserId(userId);
@@ -37,13 +41,14 @@ public class CartService {
             cartRepository.save(cart);
             return;
         }
-        double totalAmount = cartItems.stream().mapToDouble(item -> item.getQuantity() * item.getProduct().getProductPrice()).sum();
+        double totalAmount = cartItems.stream().mapToDouble(item -> productRepository.findById(item.getProduct().getProductId())
+                .map(product -> item.getQuantity() * product.getProductPrice())
+                .orElseThrow(() -> new ResourceNotFound("Product"))).sum();
         cart.setTotalAmount(totalAmount);
         cartRepository.save(cart);
     }
 
     public void emptyCart(Integer userId){
-        CartDTO cart = getCartForUser(userId);
-        updateCartTotalAmount(cart.getCartId());
+        cartRepository.deleteByUser_UserId(userId);
     }
 }

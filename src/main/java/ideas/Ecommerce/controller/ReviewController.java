@@ -30,7 +30,7 @@ public class ReviewController {
 
 //    TODO: Edit Review
     @PutMapping("/review/edit")
-    public ReviewDTO editReview(@RequestBody ReviewDTO review){
+    public ReviewDTO editReview(@RequestBody Review review){
         return reviewService.updateReview(review);
     }
 

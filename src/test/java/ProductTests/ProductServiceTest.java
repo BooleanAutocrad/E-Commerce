@@ -161,9 +161,6 @@ public class ProductServiceTest {
         when(productRepository.findById(1)).thenReturn(Optional.of(mockProduct));
         doNothing().when(productRepository).updateProductStock(1, 20);
 
-        boolean isUpdated = productService.updateProductStock(1, 20);
-
-        assertTrue(isUpdated);
         verify(productRepository).updateProductStock(1, 20);
     }
 
