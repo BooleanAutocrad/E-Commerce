@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -48,20 +49,38 @@ public class OrderItemsService {
         return orderItemRepository.findByOrder_OrderIdAndOrder_User_UserId(orderId, userId);
     }
 
+    private List<Integer> getProductIds(List<OrderItem> orderItems) {
+        return orderItems.stream()
+                .map(orderItem -> orderItem.getProduct().getProductId())
+                .collect(Collectors.toList());
+    }
+
     public List<OrderItem> saveAllOrderItems(List<OrderItem> orderItems, Integer userId) {
         Order order = orderService.createOrder(new Order(0, null, null, new ApplicationUser(userId, null, null, null, null, null, null, null, null), null));
-        final Double[] totalAmount = {0.0};
-        orderItems.forEach(orderItem -> {
-            orderItem.setOrder(new Order(order.getOrderId(), null, null, null, null));
-            Product product = productRepository.findById(orderItem.getProduct().getProductId()).orElseThrow(() -> new ResourceNotFound("Product"));
+        double totalAmount = 0.0;
+
+        List<Integer> productIds = getProductIds(orderItems);
+        List<Product> products = productService.findAllProductsByIDs(productIds);
+
+        Map<Integer, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getProductId, product -> product));
+
+        for (OrderItem orderItem : orderItems) {
+            Product product = productMap.get(orderItem.getProduct().getProductId());
+            if (product == null) {
+                throw new ResourceNotFound("Product");
+            }
             Integer productStock = product.getProductStock();
             if (productStock < orderItem.getQuantity()) {
                 throw new IllegalArgumentException("Product stock is less than the quantity you want to order");
             }
-            productService.updateProductStock(orderItem.getProduct().getProductId(), productStock - orderItem.getQuantity());
-            totalAmount[0] += product.getProductPrice() * orderItem.getQuantity();
-        });
-        orderService.setOrderTotalAmount(order , totalAmount[0]);
+            product.setProductStock(productStock - orderItem.getQuantity());
+            totalAmount += product.getProductPrice() * orderItem.getQuantity();
+            orderItem.setOrder(new Order(order.getOrderId(), null, null, null, null));
+        }
+
+        productRepository.saveAll(products);
+        orderService.setOrderTotalAmount(order, totalAmount);
 
         return StreamSupport.stream(orderItemRepository.saveAll(orderItems).spliterator(), false)
                 .collect(Collectors.toList());

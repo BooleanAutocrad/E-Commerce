@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ProductService {
@@ -28,6 +29,11 @@ public class ProductService {
         List<ProductAndRatingDTO> products = productRepository.findBy();
         return products.stream()
                 .map(this::convertToProductAndAverageRatingDTO)
+                .collect(Collectors.toList());
+    }
+
+    List<Product> findAllProductsByIDs(List<Integer> productIds){
+        return StreamSupport.stream(productRepository.findAllById(productIds).spliterator(), false)
                 .collect(Collectors.toList());
     }
 
