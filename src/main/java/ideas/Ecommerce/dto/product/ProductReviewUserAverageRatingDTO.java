@@ -22,6 +22,8 @@ public class ProductReviewUserAverageRatingDTO {
     private List<ReviewDTO> reviews;
     private RatingCountsDTO ratingCounts;
     private Double averageRating;
+    private Long userReviewCount;
+    private Long orderCount;
 
     @Getter
     @Setter

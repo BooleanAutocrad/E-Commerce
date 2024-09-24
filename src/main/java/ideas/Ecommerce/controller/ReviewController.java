@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin("*")
 @RestController
 public class ReviewController {
 
@@ -40,4 +40,9 @@ public class ReviewController {
         reviewService.deleteReview(reviewId);
     }
 
+//    TODO: Check if user has ordered the product
+    @GetMapping("/review/check/product/{productId}/user/{userId}")
+    public boolean checkIfUserHasOrderedProduct(@PathVariable Integer userId , @PathVariable Integer productId){
+        return reviewService.checkIfUserHasOrderedProduct(userId,productId);
+    }
 }

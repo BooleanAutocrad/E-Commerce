@@ -3,6 +3,7 @@ package ideas.Ecommerce.handler;
 import ideas.Ecommerce.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -10,9 +11,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFound.class)
-    public ResponseEntity<String> handleUserNotFound(ResourceNotFound userNotFound){
-        String message = userNotFound.getResourceName() + " not found";
-        return  new ResponseEntity<String>(message, HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFound resourceNotFound){
+        String message = resourceNotFound.getResourceName() + " not found";
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    }
+
+    @ExceptionHandler(ExpiredException.class)
+    public ResponseEntity<String> expiredException(ExpiredException expiredException){
+        String message = expiredException.getResourceName() + " has Expired";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
+
+    @ExceptionHandler(IncorrectUserNameOrPasswordException.class)
+    public ResponseEntity<String> handleResourceNotDeletedException(IncorrectUserNameOrPasswordException incorrectUserNameOrPasswordException) {
+        String message = "Invalid Username or password";
+        return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(IncorrectPassword.class)
@@ -38,9 +51,5 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ExpiredException.class)
-    public ResponseEntity<String> expiredException(ExpiredException expiredException){
-        String message = expiredException.getResourceName() + " has Expired";
-        return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
-    }
+
 }

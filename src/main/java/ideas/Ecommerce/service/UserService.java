@@ -1,12 +1,15 @@
 package ideas.Ecommerce.service;
 
 import ideas.Ecommerce.Entity.ApplicationUser;
+import ideas.Ecommerce.dto.user.UserJwtDTO;
 import ideas.Ecommerce.dto.user.UserOnly;
 import ideas.Ecommerce.dto.user.UserOnlyDTO;
 import ideas.Ecommerce.exception.IncorrectPassword;
+import ideas.Ecommerce.exception.IncorrectUserNameOrPasswordException;
 import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.UserRepository;
+import ideas.Ecommerce.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,13 +25,29 @@ public class UserService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    public ApplicationUser register(ApplicationUser user) throws Exception {
-        ApplicationUser existingUser = userRepository.findByEmailId(user.getEmailId());
+
+    public UserJwtDTO register(ApplicationUser newUser) throws Exception {
+        ApplicationUser existingUser = userRepository.findByEmailId(newUser.getEmailId());
         if(existingUser != null){
             throw new Exception("User Already Exists");
         }
-        return userRepository.save(user);
+        newUser.setRole("CUSTOMER");
+        ApplicationUser user = userRepository.save(newUser);
+        String jwtToken = jwtUtil.generateToken(loadUserByUsername(user.getEmailId()));
+        return new UserJwtDTO(user.getUserId(), user.getUserName(), user.getEmailId(), user.getAddress(), jwtToken);
+    }
+
+    public UserJwtDTO sendUserAndJWT(String emailId){
+        ApplicationUser user = userRepository.findByEmailId(emailId);
+        if (user == null) {
+            throw new ResourceNotFound("User");
+        }
+
+        String jwtToken = jwtUtil.generateToken(loadUserByUsername(emailId));
+        return new UserJwtDTO(user.getUserId(), user.getUserName(), user.getEmailId(), user.getAddress(), jwtToken);
     }
 
     public List<UserOnlyDTO> getAllUsers(){
@@ -43,12 +62,21 @@ public class UserService implements UserDetailsService {
     }
 
     public ApplicationUser updateUser(ApplicationUser user){
+
         ApplicationUser existingUser = userRepository.findByEmailId(user.getEmailId());
+
+        if(existingUser == null){
+            throw new ResourceNotFound("User");
+        }
+
         existingUser.setUserName(user.getUserName());
         existingUser.setEmailId(user.getEmailId());
-        existingUser.setPassword(user.getPassword());
+        if(user.getPassword() != null){
+            existingUser.setPassword(user.getPassword());
+        }
         existingUser.setAddress(user.getAddress());
-        existingUser.setRole(existingUser.getRole());
+
+
         return userRepository.save(existingUser);
     }
 
@@ -61,15 +89,16 @@ public class UserService implements UserDetailsService {
     }
 
     private UserOnly convertToUserOnlyDTO(ApplicationUser user) {
-        return new UserOnly(user.getUserId(), user.getUserName(), user.getEmailId(), user.getAddress(), user.getPassword());
+        return new UserOnly(user.getUserId(), user.getUserName(), user.getEmailId(), user.getAddress());
     }
 
     @Override
     public UserDetails loadUserByUsername(String emailId) throws UsernameNotFoundException {
         ApplicationUser user = userRepository.findByEmailId(emailId);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + emailId);
+            throw new IncorrectUserNameOrPasswordException();
         }
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmailId())
                 .password(user.getPassword())

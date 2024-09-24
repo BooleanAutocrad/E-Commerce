@@ -26,8 +26,8 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**").disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/authenticate/**","/h2-console/**").permitAll()
-                        .requestMatchers("/admin/**","/dashboard/**","/review/**","/order/**","/orderItems/**","/cart/**").hasAnyRole("CUSTOMER","ADMIN")
+                        .requestMatchers("/authenticate/**","/h2-console/**","/dashboard/**").permitAll()
+                        .requestMatchers("/admin/**","/review/**","/order/**","/orderItems/**","/cart/**","/cartitem/**").hasAnyRole("CUSTOMER","ADMIN")
                         .anyRequest().hasRole("ADMIN")
                 )
                 .headers(headers -> headers

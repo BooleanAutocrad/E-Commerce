@@ -45,7 +45,7 @@ public class ReviewService {
         }
     }
 
-    private boolean checkIfUserHasOrderedProduct(Integer userId , Integer productId){
+    public boolean checkIfUserHasOrderedProduct(Integer userId , Integer productId){
         return orderRepository.existsByUser_UserIdAndOrderItems_Product_ProductId(userId,productId);
     }
 

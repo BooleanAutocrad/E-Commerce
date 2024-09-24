@@ -1,17 +1,22 @@
 package UserTests;
 
 import ideas.Ecommerce.Entity.ApplicationUser;
+import ideas.Ecommerce.dto.user.UserJwtDTO;
 import ideas.Ecommerce.dto.user.UserOnly;
 import ideas.Ecommerce.dto.user.UserOnlyDTO;
+import ideas.Ecommerce.exception.IncorrectUserNameOrPasswordException;
 import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.UserRepository;
 import ideas.Ecommerce.service.UserService;
+import ideas.Ecommerce.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,12 +31,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private UserService userService;
@@ -41,17 +48,19 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        user = new ApplicationUser(1, "testUser", "test@example.com", "password", "address", "USER",null,null,null);
+        user = new ApplicationUser(1, "testUser", "test@example.com", "password", "address", "CUSTOMER", null, null, null);
     }
 
     @Test
     void testRegisterUser() throws Exception {
-        when(userRepository.findByEmailId(anyString())).thenReturn(null);
+        when(userRepository.findByEmailId(anyString())).thenReturn(null).thenReturn(user);
         when(userRepository.save(any(ApplicationUser.class))).thenReturn(user);
+        when(jwtUtil.generateToken(any(UserDetails.class))).thenReturn("jwtToken");
 
-        ApplicationUser result = userService.register(user);
+        UserJwtDTO result = userService.register(user);
 
         assertEquals("testUser", result.getUserName());
+        assertEquals("jwtToken", result.getJwtToken());
         verify(userRepository, times(1)).save(any(ApplicationUser.class));
     }
 
@@ -65,6 +74,26 @@ public class UserServiceTest {
 
         assertEquals("User Already Exists", exception.getMessage());
         verify(userRepository, never()).save(any(ApplicationUser.class));
+    }
+
+    @Test
+    void testSendUserAndJWT() {
+        when(userRepository.findByEmailId(anyString())).thenReturn(user);
+        when(jwtUtil.generateToken(any(UserDetails.class))).thenReturn("jwtToken");
+
+        UserJwtDTO result = userService.sendUserAndJWT("test@example.com");
+
+        assertEquals("testUser", result.getUserName());
+        assertEquals("jwtToken", result.getJwtToken());
+    }
+
+    @Test
+    void testSendUserAndJWTUserNotFound() {
+        when(userRepository.findByEmailId(anyString())).thenReturn(null);
+
+        assertThrows(ResourceNotFound.class, () -> {
+            userService.sendUserAndJWT("test@example.com");
+        });
     }
 
     @Test
@@ -138,7 +167,7 @@ public class UserServiceTest {
     void testLoadUserByUsernameNotFound() {
         when(userRepository.findByEmailId(anyString())).thenReturn(null);
 
-        assertThrows(UsernameNotFoundException.class, () -> {
+        assertThrows(IncorrectUserNameOrPasswordException.class, () -> {
             userService.loadUserByUsername("test@example.com");
         });
     }

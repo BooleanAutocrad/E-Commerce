@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("*")
 @RestController
 public class OrderController {
 
@@ -28,7 +29,7 @@ public class OrderController {
         return orderService.getOrderHistory(userId);
     }
 
-//    TODO: Get Order Details Of A Specific Order
+//    TODO: Get Order Details Of A Specific Order for User
     @GetMapping("/order/{orderId}/user/{userId}")
     public OrderWithUserAndProductsDTO getOrderDetails(@PathVariable Integer orderId ,@PathVariable Integer userId){
         return orderService.getOrderDetails(orderId,userId);
@@ -46,12 +47,6 @@ public class OrderController {
         return orderService.getOrdersBetweenDatesForUser(startDate,endDate,userId);
     }
 
-//    TODO: Get Orders Between Dates
-    @GetMapping("/order/betweendate/{startDate}/{endDate}")
-    public List<OrderOnlyDTO> getOrdersBetweenDates(@PathVariable String startDate , @PathVariable String endDate){
-        return orderService.getOrdersBetweenDates(startDate,endDate);
-    }
-
 //    TODO: Get Orders Before Date For User
     @GetMapping("/order/enddate/{endDate}/user/{userId}")
     public List<OrderOnlyDTO> getOrdersBeforeDateForUser(@PathVariable String endDate , @PathVariable Integer userId){
@@ -64,10 +59,20 @@ public class OrderController {
         return orderService.getOrdersAfterDateForUser(startDate,userId);
     }
 
+//    TODO: Get Orders Between Dates
+    @GetMapping("/order/betweendate/{startDate}/{endDate}")
+    public List<OrderOnlyDTO> getOrdersBetweenDates(@PathVariable String startDate , @PathVariable String endDate){
+        return orderService.getOrdersBetweenDates(startDate,endDate);
+    }
+
 //    TODO: Check if a user has ordered a specific product
     @GetMapping("/order/user/{userId}/product/{productId}")
     public boolean existsByUser_UserIdAndOrderItems_Product_ProductId(@PathVariable Integer userId ,@PathVariable Integer productId){
         return orderService.existsByUser_UserIdAndOrderItems_Product_ProductId(userId,productId);
     }
-
+//    TODO: Get Orders for a Specific Date
+    @GetMapping("/order/date/{date}/user/{userId}")
+    public List<OrderOnlyDTO> getOrdersForDate(@PathVariable String date, @PathVariable Integer userId){
+        return orderService.getOrdersForDate(date,userId);
+    }
 }

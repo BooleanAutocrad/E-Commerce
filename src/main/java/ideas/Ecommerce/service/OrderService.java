@@ -7,6 +7,7 @@ import ideas.Ecommerce.dto.order.OrderWithUserAndProductsDTO;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class OrderService {
     OrderRepository orderRepository;
 
     public List<OrderOnlyDTO> getOrderHistory(Integer id) {
-        return orderRepository.findByUser_UserId(id);
+        return orderRepository.findByUser_UserId(id, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     public OrderWithUserAndProductsDTO getOrderDetails(Integer orderId, Integer userId) {
@@ -63,6 +64,10 @@ public class OrderService {
     public Order setOrderTotalAmount(Order order , Double totalAmount) {
         order.setTotalAmount(totalAmount);
         return orderRepository.save(order);
+    }
+
+    public List<OrderOnlyDTO>  getOrdersForDate(String date , Integer userId){
+        return orderRepository.findByOrderDateAndUser_UserId(date,userId);
     }
 
     private OrderDTO convertToOrderDTO(Order order) {

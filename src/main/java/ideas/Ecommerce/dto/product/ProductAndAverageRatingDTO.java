@@ -19,5 +19,6 @@ public class ProductAndAverageRatingDTO {
     private CategoryDTO category;
     private RatingCountsDTO ratingCounts;
     private Double averageRating;
+    private long userReviewCount;
 
 }

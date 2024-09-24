@@ -9,9 +9,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserOnly {
+public class UserJwtDTO {
+
     private Integer userId;
     private String userName;
     private String emailId;
     private String address;
+    private String jwtToken;
 }

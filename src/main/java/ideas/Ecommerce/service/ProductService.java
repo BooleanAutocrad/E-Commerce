@@ -1,15 +1,20 @@
 package ideas.Ecommerce.service;
 
+import ideas.Ecommerce.Entity.Order;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.*;
 import ideas.Ecommerce.exception.IllegalArgument;
 import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.exception.UpdateNotPerformed;
+import ideas.Ecommerce.repositories.OrderItemRepository;
+import ideas.Ecommerce.repositories.OrderRepository;
 import ideas.Ecommerce.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,18 +26,30 @@ public class ProductService {
     @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    OrderItemRepository orderItemRepository;
+
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
 
     public List<ProductAndAverageRatingDTO> getAllProducts() {
         List<ProductAndRatingDTO> products = productRepository.findBy();
+//        Collections.shuffle(products);
         return products.stream()
-                .map(this::convertToProductAndAverageRatingDTO)
+                .map(product -> {
+                    ProductAndAverageRatingDTO dto = convertToProductAndAverageRatingDTO(product);
+                    long userReviewCount = countUsersWhoReviewedProduct(product.getProductId());
+                    dto.setUserReviewCount(userReviewCount);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
-    List<Product> findAllProductsByIDs(List<Integer> productIds){
+    public List<Product> findAllProductsByIDs(List<Integer> productIds) {
         return StreamSupport.stream(productRepository.findAllById(productIds).spliterator(), false)
                 .collect(Collectors.toList());
     }
@@ -40,6 +57,17 @@ public class ProductService {
     public ProductReviewUserAverageRatingDTO getProductById(Integer id) {
         ProductAndReviewDTO product = productRepository.findByProductId(id);
         return convertToProductReviewUserAverageRatingDTO(product);
+    }
+
+    public long countUsersWhoReviewedProduct(Integer productId) {
+        ProductAndReviewDTO product = productRepository.findByProductId(productId);
+        if (product == null) {
+            throw new ResourceNotFound("Product not found with ID: " + productId);
+        }
+        return product.getReviews().stream()
+                .map(review -> review.getUser().getUserId())
+                .distinct()
+                .count();
     }
 
     public List<ProductAndAverageRatingDTO> getAllFilteredProducts(String condition, Double price) {
@@ -100,6 +128,12 @@ public class ProductService {
         }
     }
 
+    public Long countProductOrdersInLast30Days(Integer productId) {
+        LocalDate thirtyDaysAgo = LocalDate.now().minusDays(30);
+        String formattedDate = thirtyDaysAgo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return orderItemRepository.countByOrder_OrderDateAfterAndProduct_ProductId(formattedDate, productId);
+    }
+
     private ProductAndAverageRatingDTO convertToProductAndAverageRatingDTO(ProductAndRatingDTO product) {
         ProductAndAverageRatingDTO dto = new ProductAndAverageRatingDTO();
         dto.setProductId(product.getProductId());
@@ -122,6 +156,11 @@ public class ProductService {
         dto.setProductImageURL(product.getProductImageURL());
         dto.setProductPrice(product.getProductPrice());
         dto.setProductStock(product.getProductStock());
+        dto.setUserReviewCount(product.getReviews().stream()
+                .map(review -> review.getUser().getUserId())
+                .distinct()
+                .count());
+        dto.setOrderCount(countProductOrdersInLast30Days(product.getProductId()));
 
         dto.setCategory(convertToCategoryDTO(product.getCategory()));
         dto.setRatingCounts(calculateRatingCounts(product.getReviews()));
