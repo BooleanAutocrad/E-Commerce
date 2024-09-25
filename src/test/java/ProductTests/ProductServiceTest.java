@@ -77,6 +77,34 @@ public class ProductServiceTest {
         TestAssertions.assertProductDTO(result.get(0), 1, "Test Product", "test-image-url", 100.0, 10);
     }
 
+    @Test
+    public void testFindAllProductsByIDs() {
+        List<Integer> productIds = List.of(1, 2, 3);
+
+        Product product1 = new Product();
+        product1.setProductId(1);
+        product1.setProductName("Product 1");
+
+        Product product2 = new Product();
+        product2.setProductId(2);
+        product2.setProductName("Product 2");
+
+        Product product3 = new Product();
+        product3.setProductId(3);
+        product3.setProductName("Product 3");
+
+        List<Product> mockProductList = List.of(product1, product2, product3);
+
+        when(productRepository.findAllById(productIds)).thenReturn(mockProductList);
+
+        List<Product> actualProductList = productService.findAllProductsByIDs(productIds);
+
+        assertEquals(mockProductList, actualProductList);
+
+        verify(productRepository, times(1)).findAllById(productIds);
+    }
+
+
 
     @Test
     void testGetProductById() {
@@ -189,6 +217,94 @@ public class ProductServiceTest {
         });
 
         assertEquals("Product not found", exception.getMessage());
+    }
+
+    @Test
+    void countProductOrdersInLast30Days_successfulCount() {
+        Integer productId = 1;
+        LocalDate thirtyDaysAgo = LocalDate.now().minusDays(30);
+        String formattedDate = thirtyDaysAgo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        Long expectedOrderCount = 10L;
+        when(orderItemRepository.countByOrder_OrderDateAfterAndProduct_ProductId(formattedDate, productId))
+                .thenReturn(expectedOrderCount);
+
+        Long actualOrderCount = productService.countProductOrdersInLast30Days(productId);
+
+        assertEquals(expectedOrderCount, actualOrderCount);
+        verify(orderItemRepository, times(1))
+                .countByOrder_OrderDateAfterAndProduct_ProductId(formattedDate, productId);
+    }
+
+    @Test
+    void countProductOrdersInLast30Days_zeroOrders() {
+        Integer productId = 2;
+        LocalDate thirtyDaysAgo = LocalDate.now().minusDays(30);
+        String formattedDate = thirtyDaysAgo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        Long expectedOrderCount = 0L;
+        when(orderItemRepository.countByOrder_OrderDateAfterAndProduct_ProductId(formattedDate, productId))
+                .thenReturn(expectedOrderCount);
+
+        Long actualOrderCount = productService.countProductOrdersInLast30Days(productId);
+
+        assertEquals(expectedOrderCount, actualOrderCount);
+        verify(orderItemRepository, times(1))
+                .countByOrder_OrderDateAfterAndProduct_ProductId(formattedDate, productId);
+    }
+
+    @Test
+    void countUsersWhoReviewedProduct_successfulCount() {
+        Integer productId = 1;
+
+        ProductAndReviewDTO.ReviewsDTO review1 = createMockReview(1, 1);
+        ProductAndReviewDTO.ReviewsDTO review2 = createMockReview(2, 2);
+        ProductAndReviewDTO.ReviewsDTO review3 = createMockReview(3, 3);
+        ProductAndReviewDTO.ReviewsDTO review4 = createMockReview(4, 1);
+
+        ProductAndReviewDTO product = mock(ProductAndReviewDTO.class);
+        when(product.getReviews()).thenReturn(List.of(review1, review2, review3, review4));
+        when(productRepository.findByProductId(productId)).thenReturn(product);
+
+        long distinctUserCount = productService.countUsersWhoReviewedProduct(productId);
+
+        assertEquals(3, distinctUserCount);
+        verify(productRepository, times(1)).findByProductId(productId);
+    }
+
+    @Test
+    void countUsersWhoReviewedProduct_noReviews() {
+        Integer productId = 2;
+
+        ProductAndReviewDTO product = mock(ProductAndReviewDTO.class);
+        when(product.getReviews()).thenReturn(List.of());
+        when(productRepository.findByProductId(productId)).thenReturn(product);
+
+        long distinctUserCount = productService.countUsersWhoReviewedProduct(productId);
+
+        assertEquals(0, distinctUserCount);
+        verify(productRepository, times(1)).findByProductId(productId);
+    }
+
+    @Test
+    void countUsersWhoReviewedProduct_productNotFound() {
+        Integer productId = 3;
+
+        when(productRepository.findByProductId(productId)).thenReturn(null);
+
+        assertThrows(ResourceNotFound.class, () -> productService.countUsersWhoReviewedProduct(productId));
+        verify(productRepository, times(1)).findByProductId(productId);
+    }
+
+    private ProductAndReviewDTO.ReviewsDTO createMockReview(int reviewId, int userId) {
+        ProductAndReviewDTO.ReviewsDTO review = mock(ProductAndReviewDTO.ReviewsDTO.class);
+        ProductAndReviewDTO.User user = mock(ProductAndReviewDTO.User.class);
+
+        when(review.getReviewId()).thenReturn(reviewId);
+        when(user.getUserId()).thenReturn(userId);
+        when(review.getUser()).thenReturn(user);
+
+        return review;
     }
 
 }

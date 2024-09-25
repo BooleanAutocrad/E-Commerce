@@ -21,8 +21,8 @@ public class ReviewService {
     @Autowired
     OrderRepository orderRepository;
 
-    public List<ReviewForProductDTO> getReviewForProduct(Integer Id){
-        return reviewRepository.findByProduct_ProductId(Id);
+    public List<ReviewForProductDTO> getReviewForProduct(Integer productId){
+        return reviewRepository.findByProduct_ProductId(productId);
     }
 
     public ReviewDTO writeReviewForProduct(Review review) throws Exception {
@@ -49,7 +49,7 @@ public class ReviewService {
         return orderRepository.existsByUser_UserIdAndOrderItems_Product_ProductId(userId,productId);
     }
 
-    private ReviewDTO convertReviewToReviewDTO(Review review){
+    public ReviewDTO convertReviewToReviewDTO(Review review){
         return new ReviewDTO(review.getReviewId(),review.getReview(),review.getRating(),review.getUser().getUserId(),review.getUser().getUserName(),review.getProduct().getProductId(),review.getProduct().getProductName());
     }
 
