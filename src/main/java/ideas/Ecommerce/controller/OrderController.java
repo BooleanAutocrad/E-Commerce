@@ -1,7 +1,6 @@
 package ideas.Ecommerce.controller;
 
 import ideas.Ecommerce.Entity.Order;
-import ideas.Ecommerce.dto.order.OrderDTO;
 import ideas.Ecommerce.dto.order.OrderOnlyDTO;
 import ideas.Ecommerce.dto.order.OrderWithUserAndProductsDTO;
 import ideas.Ecommerce.service.OrderService;
@@ -33,12 +32,6 @@ public class OrderController {
     @GetMapping("/order/{orderId}/user/{userId}")
     public OrderWithUserAndProductsDTO getOrderDetails(@PathVariable Integer orderId ,@PathVariable Integer userId){
         return orderService.getOrderDetails(orderId,userId);
-    }
-
-//    TODO: Get Order Details Of A Specific Order
-    @GetMapping("/order/{orderId}")
-    public OrderDTO getOrder(@PathVariable Integer orderId) throws Exception {
-        return orderService.getOrderDetails(orderId);
     }
 
 //    TODO: Get Orders Between Dates For User

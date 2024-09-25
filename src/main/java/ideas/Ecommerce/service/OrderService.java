@@ -1,17 +1,14 @@
 package ideas.Ecommerce.service;
 
 import ideas.Ecommerce.Entity.Order;
-import ideas.Ecommerce.dto.order.OrderDTO;
 import ideas.Ecommerce.dto.order.OrderOnlyDTO;
 import ideas.Ecommerce.dto.order.OrderWithUserAndProductsDTO;
-import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -19,21 +16,12 @@ public class OrderService {
     @Autowired
     OrderRepository orderRepository;
 
-    public List<OrderOnlyDTO> getOrderHistory(Integer id) {
-        return orderRepository.findByUser_UserId(id, Sort.by(Sort.Direction.DESC, "orderDate"));
+    public List<OrderOnlyDTO> getOrderHistory(Integer userId) {
+        return orderRepository.findByUser_UserId(userId, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     public OrderWithUserAndProductsDTO getOrderDetails(Integer orderId, Integer userId) {
         return orderRepository.findByOrderIdAndUser_UserId(orderId, userId);
-    }
-
-    public OrderDTO getOrderDetails(Integer orderId) throws Exception {
-        Optional<Order> order = orderRepository.findById(orderId);
-        if (order.isPresent()) {
-            return convertToOrderDTO(order.get());
-        } else {
-            throw new ResourceNotFound("Order");
-        }
     }
 
     public List<OrderOnlyDTO> getOrdersBetweenDatesForUser(String startDate, String endDate, Integer userId) {
@@ -68,10 +56,6 @@ public class OrderService {
 
     public List<OrderOnlyDTO>  getOrdersForDate(String date , Integer userId){
         return orderRepository.findByOrderDateAndUser_UserId(date,userId, Sort.by(Sort.Direction.DESC, "orderDate"));
-    }
-
-    private OrderDTO convertToOrderDTO(Order order) {
-        return new OrderDTO(order.getOrderId(), order.getTotalAmount(), order.getOrderDate(), order.getUser().getUserId(), order.getUser().getUserName(), order.getUser().getAddress());
     }
 
 }
