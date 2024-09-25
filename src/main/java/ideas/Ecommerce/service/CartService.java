@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CartService {
@@ -25,12 +26,20 @@ public class CartService {
     ProductRepository productRepository;
 
     public CartDTO getCartForUser(Integer userId){
-        return cartRepository.findByUser_UserId(userId);
+        CartDTO cart = cartRepository.findByUser_UserId(userId);
+        if(Objects.isNull(cart)){
+            throw new ResourceNotFound("Cart");
+        }
+        return cart;
     }
 
 
-    public Cart updateCart(Cart cart){
-        return cartRepository.save(cart);
+    public Cart updateCart(Cart cart) {
+        Cart updatedCart = cartRepository.save(cart);
+        if(!updatedCart.getCartId().equals(cart.getCartId())){
+            throw new ResourceNotFound("Cart ");
+        }
+        return updatedCart;
     }
 
     public void updateCartTotalAmount(Integer cartId) {

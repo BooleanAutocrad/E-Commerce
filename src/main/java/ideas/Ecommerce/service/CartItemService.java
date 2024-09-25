@@ -3,6 +3,7 @@ package ideas.Ecommerce.service;
 import ideas.Ecommerce.Entity.*;
 import ideas.Ecommerce.dto.cart.CartDTO;
 import ideas.Ecommerce.dto.cart.userCartDTO;
+import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.CartItemsRepository;
 import ideas.Ecommerce.repositories.OrderItemRepository;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class CartItemService {
@@ -37,7 +40,12 @@ public class CartItemService {
     ProductService productService;
 
     public void deleteCartItem(Integer cartItemId) {
-        Integer cartId = cartItemsRepository.findById(cartItemId).get().getCart().getCartId();
+        Optional<CartItem> cartItemOptional = cartItemsRepository.findById(cartItemId);
+        if (!cartItemOptional.isPresent()) {
+            throw new ResourceNotFound("CartItem with id: " + cartItemId);
+        }
+        CartItem cartItem = cartItemOptional.get();
+        Integer cartId = cartItem.getCart().getCartId();
         cartItemsRepository.deleteById(cartItemId);
         cartService.updateCartTotalAmount(cartId);
     }
