@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -38,9 +39,9 @@ public class ProductController {
 
 //        TODO: filter products for price
 //         VALID CONDITIONS ARE: gt,lt,eq,lte,gte
-    @GetMapping("/dashboard/product/filter/{condition}/{price}")
-    public List<ProductAndAverageRatingDTO> getProductsGreaterThan(@PathVariable String condition ,@PathVariable Double price){
-        return productService.getAllFilteredProducts(condition,price);
+    @PostMapping("/dashboard/product/search")
+    public List<ProductAndAverageRatingDTO> getProductsGreaterThan(@RequestParam(required = false) String searchText ,@RequestBody Map<String, Object> filters){
+        return productService.getAllFilteredProducts(searchText,filters);
     }
 
 //    TODO: get product for category

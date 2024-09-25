@@ -70,7 +70,13 @@ public class ProductService {
                 .count();
     }
 
-    public List<ProductAndAverageRatingDTO> getAllFilteredProducts(String condition, Double price) {
+    public List<ProductAndAverageRatingDTO> getAllFilteredProducts(String searchText, Map<String, Object> filters) {
+
+        String condition = (String) filters.get("condition");
+        double price = (double) (Integer) filters.get("price");
+        Integer categoryId = (Integer) filters.get("categoryId");
+
+
         Map<String, Function<Double, List<ProductAndRatingDTO>>> conditionMap = Map.of(
                 "gt", productRepository::findByProductPriceGreaterThan,
                 "lt", productRepository::findByProductPriceLessThan,
@@ -79,12 +85,38 @@ public class ProductService {
                 "gte", productRepository::findByProductPriceGreaterThanEqual
         );
 
-        if (!conditionMap.containsKey(condition)) {
-            throw new IllegalArgument(condition);
+
+        List<ProductAndRatingDTO> filteredProducts;
+
+
+        if (condition != null && price != 0) {
+            if (!conditionMap.containsKey(condition)) {
+                throw new IllegalArgumentException("Invalid condition: " + condition);
+            }
+            filteredProducts = conditionMap.get(condition).apply(price);
+        } else {
+            filteredProducts = productRepository.findBy();
         }
 
-        return conditionMap.get(condition).apply(price)
-                .stream()
+        if (searchText != null && !searchText.isEmpty()) {
+            filteredProducts = filteredProducts.stream()
+                    .filter(product -> product.getProductName().toLowerCase().contains(searchText.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (categoryId != 0) {
+            filteredProducts = filteredProducts.stream()
+                    .filter(product -> {
+                        ProductAndRatingDTO.CategoryDTO category = product.getCategory();
+                        return Objects.equals(category.getCategoryId(), categoryId) ||
+                                (category.getParentCategory() != null &&
+                                        Objects.equals(category.getParentCategory().getCategoryId(), categoryId));
+                    })
+                    .collect(Collectors.toList());
+        }
+
+
+        return filteredProducts.stream()
                 .map(this::convertToProductAndAverageRatingDTO)
                 .collect(Collectors.toList());
     }

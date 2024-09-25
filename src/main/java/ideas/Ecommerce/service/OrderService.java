@@ -37,19 +37,19 @@ public class OrderService {
     }
 
     public List<OrderOnlyDTO> getOrdersBetweenDatesForUser(String startDate, String endDate, Integer userId) {
-        return orderRepository.findByOrderDateBetweenAndUser_UserId(startDate, endDate, userId);
+        return orderRepository.findByOrderDateBetweenAndUser_UserId(startDate, endDate, userId, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     public List<OrderOnlyDTO> getOrdersBetweenDates(String startDate, String endDate) {
-        return orderRepository.findByOrderDateBetween(startDate, endDate);
+        return orderRepository.findByOrderDateBetween(startDate, endDate, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     public List<OrderOnlyDTO> getOrdersBeforeDateForUser(String endDate, Integer userId) {
-        return orderRepository.findByOrderDateBeforeAndUser_UserId(endDate, userId);
+        return orderRepository.findByOrderDateBeforeAndUser_UserId(endDate, userId, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     public List<OrderOnlyDTO> getOrdersAfterDateForUser(String startDate, Integer userId) {
-        return orderRepository.findByOrderDateAfterAndUser_UserId(startDate, userId);
+        return orderRepository.findByOrderDateAfterAndUser_UserId(startDate, userId, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     public boolean existsByUser_UserIdAndOrderItems_Product_ProductId(Integer userId, Integer productId) {
@@ -67,7 +67,7 @@ public class OrderService {
     }
 
     public List<OrderOnlyDTO>  getOrdersForDate(String date , Integer userId){
-        return orderRepository.findByOrderDateAndUser_UserId(date,userId);
+        return orderRepository.findByOrderDateAndUser_UserId(date,userId, Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
     private OrderDTO convertToOrderDTO(Order order) {

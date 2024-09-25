@@ -16,15 +16,15 @@ public interface OrderRepository extends CrudRepository<Order, Integer> {
 
     OrderWithUserAndProductsDTO findByOrderIdAndUser_UserId(Integer orderId, Integer userId);
 
-    List<OrderOnlyDTO> findByOrderDateBetweenAndUser_UserId(String startDate, String endDate, Integer userId);
+    List<OrderOnlyDTO> findByOrderDateBetweenAndUser_UserId(String startDate, String endDate, Integer userId, Sort sort);
 
-    List<OrderOnlyDTO> findByOrderDateBetween(String startDate, String endDate);
+    List<OrderOnlyDTO> findByOrderDateBetween(String startDate, String endDate, Sort sort);
 
-    List<OrderOnlyDTO> findByOrderDateBeforeAndUser_UserId(String endDate, Integer userId);
+    List<OrderOnlyDTO> findByOrderDateBeforeAndUser_UserId(String endDate, Integer userId, Sort sort);
 
-    List<OrderOnlyDTO> findByOrderDateAfterAndUser_UserId(String startDate, Integer userId);
+    List<OrderOnlyDTO> findByOrderDateAfterAndUser_UserId(String startDate, Integer userId, Sort sort);
 
-    List<OrderOnlyDTO> findByOrderDateAndUser_UserId(String date, Integer userId);
+    List<OrderOnlyDTO> findByOrderDateAndUser_UserId(String date, Integer userId, Sort sort);
 
     List<Order> findByOrderDateAfter(String startDate);
 

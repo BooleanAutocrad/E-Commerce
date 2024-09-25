@@ -11,6 +11,7 @@ public interface ProductAndRatingDTO {
     CategoryDTO getCategory();
     List<ReviewsDTO> getReviews();
     interface CategoryDTO extends BaseCategoryDTO{
+        BaseCategoryDTO getParentCategory();
     }
 
     interface ReviewsDTO extends BaseReviewDTO{
