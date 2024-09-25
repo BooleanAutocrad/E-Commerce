@@ -70,12 +70,48 @@ public class ProductService {
                 .count();
     }
 
-    public List<ProductAndAverageRatingDTO> getAllFilteredProducts(String searchText, Map<String, Object> filters) {
+    public List<ProductAndAverageRatingDTO> getAllFilteredProducts(String searchText, ProductFilterDTO filters) {
 
-        String condition = (String) filters.get("condition");
-        double price = (double) (Integer) filters.get("price");
-        Integer categoryId = (Integer) filters.get("categoryId");
+        List<ProductAndRatingDTO> filteredProducts = applyPriceFilter(filters);
+        filteredProducts = applySearchTextFilter(filteredProducts, searchText);
+        filteredProducts = applyCategoryFilter(filteredProducts, filters.getCategoryId());
 
+        return filteredProducts.stream()
+                .map(this::convertToProductAndAverageRatingDTO)
+                .collect(Collectors.toList());
+    }
+
+    private List<ProductAndRatingDTO> applyCategoryFilter(List<ProductAndRatingDTO> products, Integer categoryId) {
+        if (categoryId == null || categoryId == 0) {
+            return products;
+        }
+
+        return products.stream()
+                .filter(product -> {
+                    ProductAndRatingDTO.CategoryDTO category = product.getCategory();
+                    return Objects.equals(category.getCategoryId(), categoryId) ||
+                            (category.getParentCategory() != null &&
+                                    Objects.equals(category.getParentCategory().getCategoryId(), categoryId));
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<ProductAndRatingDTO> applySearchTextFilter(List<ProductAndRatingDTO> products, String searchText) {
+        if (searchText == null || searchText.isEmpty()) {
+            return products;
+        }
+        return products.stream()
+                .filter(product -> product.getProductName().toLowerCase().contains(searchText.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    private List<ProductAndRatingDTO> applyPriceFilter(ProductFilterDTO filterDTO) {
+        String condition = filterDTO.getCondition();
+        Double price = filterDTO.getPrice();
+
+        if (condition == null || price == null) {
+            return productRepository.findBy();  // Return all products if no price filter is provided
+        }
 
         Map<String, Function<Double, List<ProductAndRatingDTO>>> conditionMap = Map.of(
                 "gt", productRepository::findByProductPriceGreaterThan,
@@ -85,40 +121,11 @@ public class ProductService {
                 "gte", productRepository::findByProductPriceGreaterThanEqual
         );
 
-
-        List<ProductAndRatingDTO> filteredProducts;
-
-
-        if (condition != null && price != 0) {
-            if (!conditionMap.containsKey(condition)) {
-                throw new IllegalArgumentException("Invalid condition: " + condition);
-            }
-            filteredProducts = conditionMap.get(condition).apply(price);
-        } else {
-            filteredProducts = productRepository.findBy();
+        if (!conditionMap.containsKey(condition)) {
+            throw new IllegalArgumentException("Invalid condition: " + condition);
         }
 
-        if (searchText != null && !searchText.isEmpty()) {
-            filteredProducts = filteredProducts.stream()
-                    .filter(product -> product.getProductName().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-        }
-
-        if (categoryId != 0) {
-            filteredProducts = filteredProducts.stream()
-                    .filter(product -> {
-                        ProductAndRatingDTO.CategoryDTO category = product.getCategory();
-                        return Objects.equals(category.getCategoryId(), categoryId) ||
-                                (category.getParentCategory() != null &&
-                                        Objects.equals(category.getParentCategory().getCategoryId(), categoryId));
-                    })
-                    .collect(Collectors.toList());
-        }
-
-
-        return filteredProducts.stream()
-                .map(this::convertToProductAndAverageRatingDTO)
-                .collect(Collectors.toList());
+        return conditionMap.get(condition).apply(price);
     }
 
     public List<ProductAndAverageRatingDTO> getProductsForCategory(Integer id) {

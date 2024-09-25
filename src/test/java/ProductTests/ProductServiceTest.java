@@ -137,30 +137,28 @@ public class ProductServiceTest {
 
         when(productRepository.findByProductPriceLessThan(100.0)).thenReturn(mockedProducts);
 
-        Map<String, Object> filterConditions = new HashMap<>();
-        filterConditions.put("condition", "lt");
-        filterConditions.put("price", 100);
-        filterConditions.put("categoryId", 0);
+        ProductFilterDTO filterDTO = new ProductFilterDTO();
+        filterDTO.setCondition("lt");
+        filterDTO.setPrice(100.0);
+        filterDTO.setCategoryId(0);
 
-        List<ProductAndAverageRatingDTO> result = productService.getAllFilteredProducts("", filterConditions);
+        List<ProductAndAverageRatingDTO> result = productService.getAllFilteredProducts("", filterDTO);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-
         TestAssertions.assertProductDTO(result.get(0), 1, "Product 1", "image-url-1", 50.0, 20);
     }
 
-
     @Test
     void testGetAllFilteredProductsInvalidCondition() {
+        ProductFilterDTO filterDTO = new ProductFilterDTO();
+        filterDTO.setCondition("lp");
+        filterDTO.setPrice(100.0);
+        filterDTO.setCategoryId(0);
 
-        Map<String, Object> filterConditions = new HashMap<>();
-        filterConditions.put("condition", "lp");
-        filterConditions.put("price", 100);
-        filterConditions.put("categoryId", 0);
-
-        assertThrows(IllegalArgumentException.class, () -> productService.getAllFilteredProducts("invalid", filterConditions));
+        assertThrows(IllegalArgumentException.class, () -> productService.getAllFilteredProducts("invalid", filterDTO));
     }
+
 
     @Test
     void testGetProductsForCategory() {

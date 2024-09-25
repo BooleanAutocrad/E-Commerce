@@ -3,6 +3,7 @@ package ideas.Ecommerce.controller;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.ProductAndAverageRatingDTO;
 import ideas.Ecommerce.dto.product.ProductDTO;
+import ideas.Ecommerce.dto.product.ProductFilterDTO;
 import ideas.Ecommerce.dto.product.ProductReviewUserAverageRatingDTO;
 import ideas.Ecommerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class ProductController {
 //        TODO: filter products for price
 //         VALID CONDITIONS ARE: gt,lt,eq,lte,gte
     @PostMapping("/dashboard/product/search")
-    public List<ProductAndAverageRatingDTO> getProductsGreaterThan(@RequestParam(required = false) String searchText ,@RequestBody Map<String, Object> filters){
+    public List<ProductAndAverageRatingDTO> getProductsForCondition(@RequestParam(required = false) String searchText ,@RequestBody ProductFilterDTO filters){
         return productService.getAllFilteredProducts(searchText,filters);
     }
 
