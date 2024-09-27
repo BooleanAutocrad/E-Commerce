@@ -1,0 +1,28 @@
+@startuml
+title <size:20>Get All Products with Rating and Rating Count</size>
+|User|
+start
+:Request to get all products with ratings;
+
+|ProductController|
+:GET /dashboard/product;
+
+|ProductService|
+:Call getAllProducts() method;
+
+|ProductRepository|
+:Retrieve all products and their ratings;
+:List<ProductAndRatingDTO> products = findBy();
+
+|ProductService|
+:For each product in products:
+    :Convert to ProductAndAverageRatingDTO;
+    :Calculate rating counts;
+    :Calculate average rating;
+
+|ProductController|
+:Return List<ProductAndAverageRatingDTO>;
+
+|User|
+stop
+@enduml

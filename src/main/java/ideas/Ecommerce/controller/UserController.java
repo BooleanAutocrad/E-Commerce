@@ -34,8 +34,6 @@ public class UserController {
     @Autowired
     PasswordEncoder bCryptPasswordEncoder;
 
-//    TODO: Get user reviews
-
 //    TODO: Create New User
     @PostMapping("/authenticate/register")
     public UserJwtDTO registerUser(@RequestBody ApplicationUser user) throws Exception {

@@ -1,0 +1,41 @@
+@startuml
+title <size:20>Filter Products by Price</size>
+|User|
+start
+:Request to filter products by price;
+
+|ProductController|
+:POST /dashboard/product/search;
+
+|ProductService|
+:Call getAllFilteredProducts(searchText, filters) method;
+
+|ProductService|
+:Apply price filter based on condition;
+
+if (Condition is valid?) then (yes)
+    :Retrieve products based on condition;
+    if (Condition == "gt") then (yes)
+        :Filter products with price greater than specified price;
+    else if (Condition == "lt") then (yes)
+        :Filter products with price less than specified price;
+    else if (Condition == "eq") then (yes)
+        :Filter products with price equal to specified price;
+    else if (Condition == "lte") then (yes)
+        :Filter products with price less than or equal to specified price;
+    else if (Condition == "gte") then (yes)
+        :Filter products with price greater than or equal to specified price;
+    endif
+
+    :Return filtered products;
+else (no)
+    :Throw Exception (Invalid Condition);
+    stop
+endif
+
+|ProductController|
+:Return List<ProductAndAverageRatingDTO>;
+
+|User|
+stop
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+title <size:20>Login User</size>
+|User|
+start
+:Submit login form;
+
+|UserController|
+:POST /authenticate/login;
+
+|UserService|
+:Authenticate user credentials;
+
+if (Credentials valid?) then (yes)
+    :Generate JWT token;
+    |JwtUtil|
+    :Create JWT Token;
+    :Return UserJwtDTO;
+else (no)
+    :Throw Exception (Incorrect Username or Password);
+    stop
+endif
+
+|User|
+stop
+@enduml

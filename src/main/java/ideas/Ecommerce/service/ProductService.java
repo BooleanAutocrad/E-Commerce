@@ -1,14 +1,10 @@
 package ideas.Ecommerce.service;
 
-import ideas.Ecommerce.Entity.Order;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.*;
-import ideas.Ecommerce.exception.IllegalArgument;
 import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
-import ideas.Ecommerce.exception.UpdateNotPerformed;
 import ideas.Ecommerce.repositories.OrderItemRepository;
-import ideas.Ecommerce.repositories.OrderRepository;
 import ideas.Ecommerce.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,9 +21,6 @@ public class ProductService {
 
     @Autowired
     ProductRepository productRepository;
-
-    @Autowired
-    OrderRepository orderRepository;
 
     @Autowired
     OrderItemRepository orderItemRepository;

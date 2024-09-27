@@ -1,0 +1,33 @@
+@startuml
+title <size:20>Delete Product from Cart</size>
+
+|User|
+start
+:Request to delete product from cart;
+:CartItem ID: {id};
+
+|<color:green>CartController</color>|
+:Delete /cartitem/{cartItemId};
+
+|<color:orange>CartItemService</color>|
+:Call deleteCartItem(cartItemId) method;
+
+|<color:red>CartItemRepository</color>|
+:Retrieve cart item by ID;
+
+|<color:orange>CartItemService</color>|
+if (CartItem found?) then (no)
+    |<color:orange>CartItemService</color>|
+    :Throw Exception (CartItem not found);
+    stop
+else (yes)
+    |<color:red>CartItemRepository</color>|
+    :Delete cart item;
+endif
+
+|<color:orange>CartService</color>|
+:Update cart total amount;
+
+stop
+
+@enduml

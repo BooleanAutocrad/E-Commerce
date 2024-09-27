@@ -1,0 +1,29 @@
+@startuml
+title <size:20>Get Products for Category</size>
+|User|
+start
+:Send request to get products for category;
+:Category ID: {id};
+
+|ProductController|
+:Get /dashboard/product/category/{id};
+
+|ProductService|
+:Call getProductsForCategory(id) method;
+
+|ProductService|
+:Retrieve products for the given category ID;
+
+if (Products found?) then (yes)
+    :Return List<ProductAndAverageRatingDTO>;
+else (no)
+    :Throw Exception (No Products Found);
+    stop
+endif
+
+|ProductController|
+:Return List<ProductAndAverageRatingDTO>;
+
+|User|
+stop
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+title <size:20>Update or Add Product to Cart</size>
+|User|
+start
+:Request to update or add product to cart;
+:User ID: {userId};
+:CartItem ID: {cartItemId} Quantity: {quantity} Product ID: {productId};
+
+|<color:green>CartController</color>|
+:Put /cartitem/update/user/{userId};
+:Request Body: {CartItem};
+
+|<color:orange>CartItemService</color>|
+:Call updateOrAddProductToCart(userId, cartItem) method;
+
+|<color:Orange>CartService</color>|
+:Retrieve cart by user ID;
+
+|<color:orange>CartItemService</color>|
+if(Cart found?) then (yes)
+|<color:orange>CartItemService</color>|
+    :Set Cart Id to CartItem;
+else (no)
+    :Create new cart;
+    |<color:Orange>CartService</color>|
+    :Update Cart;
+    |<color:Red>CartRepository</color>|
+    :Save cart;
+    |<color:orange>CartItemService</color>|
+    :Set Cart Id to CartItem;
+endif
+
+|<color:Red>CartItemRepository</color>|
+:Check if CartItem exists for the same Product Id;
+
+|<color:orange>CartItemService</color>|
+if(CartItem exists?) then (yes)
+    |<color:orange>CartItemService</color>|
+    :Update CartItem Quantity;
+else (no)
+    |<color:orange>CartItemService</color>|
+    :Save CartItem;
+endif
+
+|<color:Red>CartItemRepository</color>|
+:Save CartItem;
+
+|<color:Orange>CartService</color>|
+:Update Cart total amount;
+
+stop
+
+@enduml

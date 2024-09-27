@@ -1,0 +1,28 @@
+@startuml
+title <size:20>Create New User</size>
+|User|
+start
+:Submit registration form;
+
+|UserController|
+:POST /authenticate/register;
+
+|UserService|
+:Check if user exists;
+if (user exists) then (yes)
+    :Return error message;
+    stop
+else (no)
+    :Create new user;
+    :Return success message;
+
+:Generate JWT token;
+
+|JwtUtil|
+:Create JWT Token;
+
+:Return UserJwtDTO;
+
+|User|
+stop
+@enduml

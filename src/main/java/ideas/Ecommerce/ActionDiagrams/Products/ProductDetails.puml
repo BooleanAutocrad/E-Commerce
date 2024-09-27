@@ -1,0 +1,34 @@
+@startuml
+title <size:20>Get Product by ID with Rating, Reviews, and Rating Count</size>
+|User|
+start
+:Request to get product by ID;
+
+|ProductController|
+:GET /dashboard/product/{id};
+
+|ProductService|
+:Call getProductById(id) method;
+
+|ProductRepository|
+:Retrieve product by ID;
+:ProductAndReviewDTO product = findByProductId(id);
+
+|ProductService|
+if (Product exists?) then (yes)
+    :Convert to ProductReviewUserAverageRatingDTO;
+    :Calculate user review count;
+    :Calculate rating counts;
+    :Calculate average rating;
+    :Return ProductReviewUserAverageRatingDTO;
+else (no)
+    :Throw Exception (Product Not Found);
+    stop
+endif
+
+|ProductController|
+:Return ProductReviewUserAverageRatingDTO;
+
+|User|
+stop
+@enduml

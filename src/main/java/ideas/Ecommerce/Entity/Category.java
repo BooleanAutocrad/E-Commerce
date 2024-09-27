@@ -22,7 +22,7 @@ public class Category {
     private String categoryName;
 
     @ManyToOne
-    @JoinColumn(name = "parent_category_id") // FK name
+    @JoinColumn(name = "parent_category_id")
     Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory")

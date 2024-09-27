@@ -1,0 +1,31 @@
+@startuml
+title <size:20>Update Existing User</size>
+|Admin User|
+start
+:Submit user update form;
+
+|UserController|
+:PUT /admin/users;
+
+|UserService|
+:Check if user exists;
+
+if (User exists?) then (yes)
+    :Check if password is provided;
+    if (Password provided?) then (yes)
+        :Encrypt new password;
+    else (no)
+        :Keep existing password;
+    endif
+
+    :Update user details;
+    :Save updated user to repository;
+    :Return updated UserOnly DTO;
+else (no)
+    :Throw Exception (User Not Found);
+    stop
+endif
+
+|Admin User|
+stop
+@enduml

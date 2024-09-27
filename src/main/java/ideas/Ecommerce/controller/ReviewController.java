@@ -25,7 +25,8 @@ public class ReviewController {
 //    TODO: Get Review For A Specific Product
     @GetMapping("/review/product")
     public List<ReviewForProductDTO> getReviewForProduct(@RequestBody Product product){
-        return reviewService.getReviewForProduct(product.getProductId());
+        List<ReviewForProductDTO> result = reviewService.getReviewForProduct(product.getProductId());
+        return result;
     }
 
 //    TODO: Edit Review

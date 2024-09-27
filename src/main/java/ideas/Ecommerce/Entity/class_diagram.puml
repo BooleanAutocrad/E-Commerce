@@ -1,0 +1,74 @@
+@startuml
+
+class ApplicationUser {
+    Integer userId
+    String userName
+    String emailId
+    String password
+    String address
+    String role
+}
+
+class Cart {
+    Integer cartId
+    Double totalAmount
+}
+
+class CartItem {
+    Integer cartItemId
+    Integer quantity
+}
+
+class Category {
+    Integer categoryId
+    String categoryName
+}
+
+class Order {
+    Integer orderId
+    Double totalAmount
+    String orderDate
+}
+
+class OrderItem {
+    Integer orderItemId
+    Integer quantity
+}
+
+class Product {
+    Integer productId
+    String productName
+    String productImageURL
+    Double productPrice
+    Integer productStock
+}
+
+class Review {
+    Integer reviewId
+    String review
+    Integer rating
+}
+
+' Relationships
+ApplicationUser "1" -- "0..1" Cart : has
+ApplicationUser "1" -- "0..*" Order : places
+ApplicationUser "1" -- "0..*" Review : writes
+
+Cart "1" -- "0..*" CartItem : contains
+CartItem "1" -- "1" Cart : belongs to
+CartItem "1" -- "1" Product : contains
+
+Category "1" -- "0..*" Category : subcategories
+Category "1" -- "0..*" Product : has
+
+Order "1" -- "0..*" OrderItem : contains
+OrderItem "1" -- "1" Product : contains
+
+Product "1" -- "0..*" CartItem : has
+Product "1" -- "0..*" OrderItem : belongs to
+Product "1" -- "0..*" Review : receives
+
+Review "1" -- "1" Product : written for
+Review "1" -- "1" ApplicationUser : by
+
+@enduml

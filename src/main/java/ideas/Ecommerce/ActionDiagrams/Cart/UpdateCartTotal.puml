@@ -1,0 +1,48 @@
+@startuml
+title <size:20>Update Cart Total</size>
+
+|<color:orange>Any Method In Service</color>|
+start
+:Request to update cart total;
+:Cart ID: {id};
+
+|<color:orange>CartService</color>|
+:Call updateCartTotal(id) method;
+
+|<color:red>CartRepository</color>|
+:Retrieve cart by cart item ID;
+
+|<color:orange>CartService</color>|
+if (Cart found?) then (yes)
+    |<color:red>CartItemRepository</color>|
+    :Retrieve all cart items for the cart;
+
+    |<color:orange>CartService</color>|
+    if (CartItems found?) then (yes)
+        :Calculate total amount;
+        |<color:red>ProductRepository</color>|
+        :Retrieve product by ID;
+        if (Product found?) then (yes)
+            |<color:orange>CartService</color>|
+            :Calculate total amount;
+            |<color:red>CartRepository</color>|
+            :Save Cart;
+            stop
+        else (no)
+            |<color:orange>CartService</color>|
+            :Throw Exception (Product not found);
+            stop
+        endif
+    else (no)
+        :Set total amount to 0;
+        |<color:red>CartRepository</color>|
+        :Save Cart;
+        stop
+    endif
+else (no)
+    |<color:orange>CartService</color>|
+    :Throw Exception (Cart not found);
+    stop
+endif
+
+@enduml
