@@ -1,5 +1,6 @@
 package ideas.Ecommerce.service;
 
+import ideas.Ecommerce.Entity.ApplicationUser;
 import ideas.Ecommerce.Entity.Cart;
 import ideas.Ecommerce.Entity.CartItem;
 import ideas.Ecommerce.dto.cart.CartDTO;
@@ -28,7 +29,10 @@ public class CartService {
     public CartDTO getCartForUser(Integer userId){
         CartDTO cart = cartRepository.findByUser_UserId(userId);
         if(Objects.isNull(cart)){
-            throw new ResourceNotFound("Cart");
+            Cart newCart = new Cart();
+            newCart.setUser(new ApplicationUser(userId, null, null, null, null, null, null, null, null));
+            updateCart(newCart);
+            return cartRepository.findByUser_UserId(userId);
         }
         return cart;
     }

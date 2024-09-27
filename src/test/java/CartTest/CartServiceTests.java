@@ -55,17 +55,6 @@ public class CartServiceTests {
     }
 
     @Test
-    public void testGetCartForUser_NotFound() {
-        Integer userId = 1;
-
-        when(cartRepository.findByUser_UserId(userId)).thenReturn(null);
-
-        assertThrows(ResourceNotFound.class, () -> {
-            cartService.getCartForUser(userId);
-        });
-    }
-
-    @Test
     public void testUpdateCart_Success() {
         Cart cart = new Cart();
         cart.setCartId(1);
