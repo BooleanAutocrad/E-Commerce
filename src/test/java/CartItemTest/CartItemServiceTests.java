@@ -5,6 +5,7 @@ import ideas.Ecommerce.Entity.CartItem;
 import ideas.Ecommerce.Entity.OrderItem;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.cart.CartDTO;
+import ideas.Ecommerce.dto.cart.userCartDTO;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.CartItemsRepository;
 import ideas.Ecommerce.repositories.OrderItemRepository;
@@ -174,6 +175,7 @@ public class CartItemServiceTests {
         assertEquals(cartItemCount, cartItemService.getCartItemCount(userId).getCartItemCount());
         assertEquals(totalAmount, cartItemService.getCartItemCount(userId).getCartTotalAmount());
     }
+
 
     @Test
     public void testDeleteCartItems_Success() {

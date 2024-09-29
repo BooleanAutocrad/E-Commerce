@@ -2,6 +2,7 @@ package ideas.Ecommerce.service;
 
 import ideas.Ecommerce.Entity.*;
 import ideas.Ecommerce.dto.cart.CartDTO;
+import ideas.Ecommerce.dto.cart.ProductDTO;
 import ideas.Ecommerce.dto.cart.userCartDTO;
 import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CartItemService {
@@ -70,7 +72,17 @@ public class CartItemService {
             throw new ResourceNotFound("User Cart");
         }
 
-        return new userCartDTO(cartItemsRepository.getCartItemCountByCartId(cart.getCartId()), cart.getTotalAmount());
+        List<CartItem> cartItems = cartItemsRepository.findByCart_CartId(cart.getCartId());
+        List<ProductDTO> productDTOs = cartItems.stream()
+                .map(cartItem -> {
+                    Product product = cartItem.getProduct();
+                    return new ProductDTO(product.getProductId(),
+                            product.getProductName(),
+                            cartItem.getQuantity());
+                })
+                .toList();
+
+        return new userCartDTO(cartItemsRepository.getCartItemCountByCartId(cart.getCartId()), cart.getTotalAmount(), productDTOs);
     }
 
     public void deleteCartItems(Integer cartItemId) {
@@ -89,8 +101,12 @@ public class CartItemService {
         }
         CartItem existingCartItemForProduct = cartItemsRepository.findByCart_CartIdAndProduct_ProductId(cartItem.getCart().getCartId(), cartItem.getProduct().getProductId());
         if (existingCartItemForProduct != null) {
-            existingCartItemForProduct.setQuantity(cartItem.getQuantity());
-            cartItemsRepository.save(existingCartItemForProduct);
+            if(cartItem.getQuantity() == 0){
+                cartItemsRepository.delete(existingCartItemForProduct);
+            } else {
+                existingCartItemForProduct.setQuantity(cartItem.getQuantity());
+                cartItemsRepository.save(existingCartItemForProduct);
+            }
         } else {
             cartItemsRepository.save(cartItem);
         }

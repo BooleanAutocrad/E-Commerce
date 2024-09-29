@@ -1,0 +1,82 @@
+@startuml
+!define USER_COLOR #FFCCFF
+!define CART_COLOR #CCFFCC
+!define CART_ITEM_COLOR #FFFFCC
+!define CATEGORY_COLOR #CCFFFF
+!define ORDER_COLOR #FFCC99
+!define ORDER_ITEM_COLOR #FFCCFF
+!define PRODUCT_COLOR #CCFF99
+!define REVIEW_COLOR #FFCCCC
+
+entity "ApplicationUser" as User << (U,USER_COLOR) >> {
+    + Integer userId <<PK>>
+    + String userName
+    + String emailId <<UK>>
+    + String password
+    + String address
+    + String role
+}
+
+entity "Cart" as Cart << (C,CART_COLOR) >> {
+    + Integer cartId <<PK>>
+    + Double totalAmount
+    + Integer userId <<FK>>  // Foreign key from ApplicationUser
+}
+
+entity "CartItem" as CartItem << (C,CART_ITEM_COLOR) >> {
+    + Integer cartItemId <<PK>>
+    + Integer quantity
+    + Integer cartId <<FK>>  // Foreign key from Cart
+    + Integer productId <<FK>>  // Foreign key from Product
+}
+
+entity "Category" as Category << (C,CATEGORY_COLOR) >> {
+    + Integer categoryId <<PK>>
+    + String categoryName
+    + Integer parentCategoryId <<FK>>  // Foreign key from Category (self-referencing)
+}
+
+entity "Order" as Order << (O,ORDER_COLOR) >> {
+    + Integer orderId <<PK>>
+    + Double totalAmount
+    + String orderDate
+    + Integer userId <<FK>>  // Foreign key from ApplicationUser
+}
+
+entity "OrderItem" as OrderItem << (O,ORDER_ITEM_COLOR) >> {
+    + Integer orderItemId <<PK>>
+    + Integer quantity
+    + Integer orderId <<FK>>  // Foreign key from Order
+    + Integer productId <<FK>>  // Foreign key from Product
+}
+
+entity "Product" as Product << (P,PRODUCT_COLOR) >> {
+    + Integer productId <<PK>>
+    + String productName
+    + String productImageURL
+    + Double productPrice
+    + Integer productStock
+    + Integer categoryId <<FK>>  // Foreign key from Category
+}
+
+entity "Review" as Review << (R,REVIEW_COLOR) >> {
+    + Integer reviewId <<PK>>
+    + String review
+    + Integer rating
+    + Integer userId <<FK>>  // Foreign key from ApplicationUser
+    + Integer productId <<FK>>  // Foreign key from Product
+}
+
+User "1" -- "1" Cart : owns >
+User "1" -- "0..*" Order : places >
+User "1" -- "0..*" Review : writes >
+Cart "1" -- "0..*" CartItem : contains >
+Order "1" -- "0..*" OrderItem : includes >
+Category "1" -- "0..*" Product : contains >
+CartItem "1" -- "1" Product : represents >
+OrderItem "1" -- "1" Product : includes >
+Review "1" -- "1" Product : relates to >
+Review "1" -- "1" User : written by >
+Category "1" -- "0..*" Category : has subcategories >
+
+@enduml

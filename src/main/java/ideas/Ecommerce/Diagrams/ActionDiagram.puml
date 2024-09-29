@@ -1,0 +1,32 @@
+@startuml
+start
+
+:View Products and Categories;
+:Filter Products by Category;
+:Filter Products by Price;
+:Search Products;
+:View Product Reviews;
+
+if (Logged In?) then (yes)
+    :Add Product to Cart;
+    :Directly Buy Product;
+    :Checkout Cart;
+    :View Order History;
+    :Filter Order History by Date;
+
+    if (Ordered Product?) then (yes)
+        :Add Review for Ordered Product;
+        if (Edit Existing Review?) then (yes)
+            :Edit Review;
+        else (no)
+            :Cannot Add New Review;
+        endif
+    else (no)
+        :Cannot Add Review;
+    endif
+else (no)
+    :Continue as Guest;
+endif
+
+stop
+@enduml

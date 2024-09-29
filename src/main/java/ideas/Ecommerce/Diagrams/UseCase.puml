@@ -1,0 +1,47 @@
+@startuml
+!define LIGHTBLUE #ADD8E6
+!define LIGHTGREEN #90EE90
+!define LIGHTYELLOW #FFFFE0
+
+skinparam actor {
+    BackgroundColor LIGHTGREEN
+    BorderColor black
+    FontColor black
+}
+
+skinparam usecase {
+    BackgroundColor LIGHTBLUE
+    BorderColor black
+    FontColor black
+    ArrowColor black
+}
+
+left to right direction
+
+rectangle "Guest Actions" as GuestBox {
+    actor Guest as Customer
+    Customer --> (View Products)
+    Customer --> (View Categories)
+    Customer --> (Filter Products by Category)
+    Customer --> (Filter Products by Price)
+    Customer --> (Search Products)
+    Customer --> (View Product Reviews)
+}
+
+rectangle "LoggedIn Customer Actions" as LoggedInBox {
+    actor LoggedIn as LoggedInCustomer
+    LoggedInCustomer --> (Add Product to Cart)
+    LoggedInCustomer --> (Buy Product Directly)
+    LoggedInCustomer --> (Checkout Cart)
+    LoggedInCustomer --> (View Order History)
+    LoggedInCustomer --> (Filter Order History by Date)
+    LoggedInCustomer --> (Add Review for Ordered Product)
+    LoggedInCustomer --> (Edit Review for Ordered Product)
+    (Add Review for Ordered Product) .> (Cannot Add New Review for Same Product) : extends
+}
+
+LoggedInBox --> GuestBox
+
+
+
+@enduml
