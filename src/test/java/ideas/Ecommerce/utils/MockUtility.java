@@ -1,4 +1,4 @@
-package utils;
+package ideas.Ecommerce.utils;
 
 import ideas.Ecommerce.dto.product.*;
 import ideas.Ecommerce.Entity.Product;

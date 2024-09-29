@@ -1,4 +1,4 @@
-package ProductTests;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.*;
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import utils.MockUtility;
-import utils.TestAssertions;
+import ideas.Ecommerce.utils.MockUtility;
+import ideas.Ecommerce.utils.TestAssertions;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

@@ -1,4 +1,4 @@
-package CategoryTest;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.Category;
 import ideas.Ecommerce.dto.category.CategoryIdAndNameDTO;

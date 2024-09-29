@@ -1,4 +1,4 @@
-package CartTest;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.Cart;
 import ideas.Ecommerce.Entity.CartItem;

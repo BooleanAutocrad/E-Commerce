@@ -1,4 +1,4 @@
-package UserTests;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.ApplicationUser;
 import ideas.Ecommerce.dto.user.UserJwtDTO;
@@ -17,10 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;

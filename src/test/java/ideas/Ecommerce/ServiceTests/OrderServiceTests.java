@@ -1,4 +1,4 @@
-package OrderTest;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.Order;
 import ideas.Ecommerce.dto.order.OrderOnlyDTO;

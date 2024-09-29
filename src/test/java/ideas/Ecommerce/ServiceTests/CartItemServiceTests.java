@@ -1,11 +1,10 @@
-package CartItemTest;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.Cart;
 import ideas.Ecommerce.Entity.CartItem;
 import ideas.Ecommerce.Entity.OrderItem;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.cart.CartDTO;
-import ideas.Ecommerce.dto.cart.userCartDTO;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.CartItemsRepository;
 import ideas.Ecommerce.repositories.OrderItemRepository;
@@ -29,6 +28,7 @@ import static org.mockito.Mockito.*;
 public class CartItemServiceTests {
 
     @InjectMocks
+//    private CartItemService cartItemService;
     private CartItemService cartItemService;
 
     @Mock

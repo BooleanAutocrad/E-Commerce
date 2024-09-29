@@ -1,4 +1,4 @@
-package ReviewTest;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.ApplicationUser;
 import ideas.Ecommerce.Entity.Product;

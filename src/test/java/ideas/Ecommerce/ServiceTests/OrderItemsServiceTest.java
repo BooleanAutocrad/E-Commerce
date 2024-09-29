@@ -1,4 +1,4 @@
-package OrderItems;
+package ideas.Ecommerce.ServiceTests;
 
 import ideas.Ecommerce.Entity.ApplicationUser;
 import ideas.Ecommerce.Entity.Order;

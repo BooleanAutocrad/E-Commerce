@@ -1,4 +1,4 @@
-package utils;
+package ideas.Ecommerce.utils;
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.ProductAndAverageRatingDTO;
 import ideas.Ecommerce.dto.product.ProductReviewUserAverageRatingDTO;

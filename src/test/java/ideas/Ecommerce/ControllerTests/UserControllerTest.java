@@ -1,4 +1,4 @@
-package UserTests;
+package ideas.Ecommerce.ControllerTests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ideas.Ecommerce.CapstoneDataApplication;

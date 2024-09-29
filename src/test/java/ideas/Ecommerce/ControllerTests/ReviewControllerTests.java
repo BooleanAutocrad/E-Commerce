@@ -1,4 +1,4 @@
-package ReviewTest;
+package ideas.Ecommerce.ControllerTests;
 
 import ideas.Ecommerce.CapstoneDataApplication;
 import ideas.Ecommerce.Entity.ApplicationUser;
