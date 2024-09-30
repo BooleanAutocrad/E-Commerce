@@ -18,28 +18,46 @@ skinparam usecase {
 
 left to right direction
 
-rectangle "Guest Actions" as GuestBox {
-    actor Guest as Customer
-    Customer --> (View Products)
-    Customer --> (View Categories)
-    Customer --> (Filter Products by Category)
-    Customer --> (Filter Products by Price)
-    Customer --> (Search Products)
-    Customer --> (View Product Reviews)
+rectangle "Use case" {
+    package "LoggedIn Customer Actions" {
+        actor "LoggedIn" as LoggedInCustomer
+        usecase "Add Product to Cart" as UC1
+        usecase "Buy Product Directly" as UC2
+        usecase "Checkout Cart" as UC3
+        usecase "View Order History" as UC4
+        usecase "Filter Order History by Date" as UC5
+        usecase "Add Review for Ordered Product" as UC6
+        usecase "Edit Review for Ordered Product" as UC7
+        usecase "Cannot Add New Review for Same Product" as UC8
+    }
+
+    package "Guest Actions" {
+        actor "Guest" as Customer
+        usecase "View Products" as UC9
+        usecase "View Categories" as UC10
+        usecase "Filter Products by Category" as UC11
+        usecase "Filter Products by Price" as UC12
+        usecase "Search Products" as UC13
+        usecase "View Product Reviews" as UC14
+    }
 }
 
-rectangle "LoggedIn Customer Actions" as LoggedInBox {
-    actor LoggedIn as LoggedInCustomer
-    LoggedInCustomer --> (Add Product to Cart)
-    LoggedInCustomer --> (Buy Product Directly)
-    LoggedInCustomer --> (Checkout Cart)
-    LoggedInCustomer --> (View Order History)
-    LoggedInCustomer --> (Filter Order History by Date)
-    LoggedInCustomer --> (Add Review for Ordered Product)
-    LoggedInCustomer --> (Edit Review for Ordered Product)
-    (Add Review for Ordered Product) .> (Cannot Add New Review for Same Product) : extends
-}
+LoggedInCustomer --> UC1
+LoggedInCustomer --> UC2
+LoggedInCustomer --> UC3
+LoggedInCustomer --> UC4
+LoggedInCustomer --> UC5
+LoggedInCustomer --> UC6
+LoggedInCustomer --> UC7
+UC6 .> UC8 : extends
 
-LoggedInBox --> GuestBox
+Customer --> UC9
+Customer --> UC10
+Customer --> UC11
+Customer --> UC12
+Customer --> UC13
+Customer --> UC14
+
+LoggedInCustomer --|> Customer
 
 @enduml

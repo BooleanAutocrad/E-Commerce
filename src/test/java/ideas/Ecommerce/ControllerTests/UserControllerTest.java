@@ -101,7 +101,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.address").value("123 Main St"));
     }
 
-    @WithMockUser(username = "abc@gmail.com", roles = {"USER"})
+    @WithMockUser(username = "abc@gmail.com", roles = {"CUSTOMER"})
     @Test
     void shouldThrowIncorrectUserNameOrPasswordException() throws Exception {
         ApplicationUser user = new ApplicationUser();

@@ -125,6 +125,66 @@ public class OrderControllerTests {
 
     @WithMockUser(username = "abc@gmail.com", roles = {"CUSTOMER"})
     @Test
+    void shouldGetOrdersBeforeDateForUser() throws Exception {
+        List<OrderOnlyDTO> orders = new ArrayList<>();
+        orders.add(orderOnlyDTO);
+
+        when(orderService.getOrdersBeforeDateForUser("2024-09-30", 1)).thenReturn(orders);
+
+        mockMvc.perform(get("/order/enddate/{endDate}/user/{userId}", "2024-09-30", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", header))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderId").value(1));
+    }
+
+    @WithMockUser(username = "abc@gmail.com", roles = {"CUSTOMER"})
+    @Test
+    void shouldGetOrdersAfterDateForUser() throws Exception {
+        List<OrderOnlyDTO> orders = new ArrayList<>();
+        orders.add(orderOnlyDTO);
+
+        when(orderService.getOrdersAfterDateForUser("2024-09-01", 1)).thenReturn(orders);
+
+        mockMvc.perform(get("/order/startdate/{startDate}/user/{userId}", "2024-09-01", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", header))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderId").value(1));
+    }
+
+    @WithMockUser(username = "abc@gmail.com", roles = {"CUSTOMER"})
+    @Test
+    void shouldGetOrdersBetweenDates() throws Exception {
+        List<OrderOnlyDTO> orders = new ArrayList<>();
+        orders.add(orderOnlyDTO);
+
+        when(orderService.getOrdersBetweenDates("2024-09-01", "2024-09-30")).thenReturn(orders);
+
+        mockMvc.perform(get("/order/betweendate/{startDate}/{endDate}", "2024-09-01", "2024-09-30")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", header))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderId").value(1));
+    }
+
+    @WithMockUser(username = "abc@gmail.com", roles = {"CUSTOMER"})
+    @Test
+    void shouldGetOrdersForDate() throws Exception {
+        List<OrderOnlyDTO> orders = new ArrayList<>();
+        orders.add(orderOnlyDTO);
+
+        when(orderService.getOrdersForDate("2024-09-01", 1)).thenReturn(orders);
+
+        mockMvc.perform(get("/order/date/{date}/user/{userId}", "2024-09-01", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", header))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderId").value(1));
+    }
+
+    @WithMockUser(username = "abc@gmail.com", roles = {"CUSTOMER"})
+    @Test
     void shouldCheckIfUserHasOrderedProduct() throws Exception {
         when(orderService.existsByUser_UserIdAndOrderItems_Product_ProductId(1, 1)).thenReturn(true);
 
