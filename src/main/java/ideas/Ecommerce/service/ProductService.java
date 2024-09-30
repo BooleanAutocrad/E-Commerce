@@ -2,6 +2,7 @@ package ideas.Ecommerce.service;
 
 import ideas.Ecommerce.Entity.Product;
 import ideas.Ecommerce.dto.product.*;
+import ideas.Ecommerce.exception.IllegalArgument;
 import ideas.Ecommerce.exception.ResourceNotDeleted;
 import ideas.Ecommerce.exception.ResourceNotFound;
 import ideas.Ecommerce.repositories.OrderItemRepository;
@@ -103,7 +104,7 @@ public class ProductService {
         Double price = filterDTO.getPrice();
 
         if (condition == null || price == null) {
-            return productRepository.findBy();  // Return all products if no price filter is provided
+            return productRepository.findBy();
         }
 
         Map<String, Function<Double, List<ProductAndRatingDTO>>> conditionMap = Map.of(
@@ -115,7 +116,7 @@ public class ProductService {
         );
 
         if (!conditionMap.containsKey(condition)) {
-            throw new IllegalArgumentException("Invalid condition: " + condition);
+            throw new IllegalArgument("Invalid condition: " + condition);
         }
 
         return conditionMap.get(condition).apply(price);
